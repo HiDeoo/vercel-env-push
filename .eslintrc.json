@@ -1,0 +1,22 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:import/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:unicorn/recommended",
+    "prettier"
+  ],
+  "ignorePatterns": ["dist/"],
+  "rules": {
+    "import/no-unresolved": "off",
+    "import/order": [
+      "warn",
+      { "newlines-between": "always", "alphabetize": { "order": "asc", "caseInsensitive": true } }
+    ],
+    "no-unused-vars": "off",
+    "no-var": "off",
+    "@typescript-eslint/no-unused-vars": ["warn", { "ignoreRestSiblings": true }],
+    "no-constant-binary-expression": "error",
+    "unicorn/prevent-abbreviations": "off"
+  }
+}
