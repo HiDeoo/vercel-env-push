@@ -3,7 +3,6 @@
     "allowJs": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "incremental": true,
     "lib": ["esnext"],
     "module": "esnext",
     "moduleResolution": "node",
