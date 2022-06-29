@@ -1,0 +1,47 @@
+{
+  "name": "vercel-env-push",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "bin": "./cli.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "dev": "unbuild --stub",
+    "build": "unbuild",
+    "lint": "prettier -c . && eslint . --max-warnings=0 --ext .ts && tsc --noEmit",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@types/node": "14.18.21",
+    "@typescript-eslint/eslint-plugin": "5.30.0",
+    "@typescript-eslint/parser": "5.30.0",
+    "eslint": "8.18.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-unicorn": "42.0.0",
+    "husky": "8.0.1",
+    "lint-staged": "13.0.3",
+    "prettier": "2.7.1",
+    "typescript": "4.7.4",
+    "unbuild": "0.7.4"
+  },
+  "packageManager": "pnpm@7.4.0",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown --cache",
+    "**/*.ts": "eslint . --max-warnings=0 --ext .ts"
+  },
+  "dependencies": {
+    "cac": "6.7.12"
+  }
+}
