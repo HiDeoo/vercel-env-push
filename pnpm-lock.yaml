@@ -4,6 +4,7 @@ specifiers:
   '@types/node': 14.18.21
   '@typescript-eslint/eslint-plugin': 5.30.0
   '@typescript-eslint/parser': 5.30.0
+  cac: 6.7.12
   eslint: 8.18.0
   eslint-config-prettier: 8.5.0
   eslint-plugin-import: 2.26.0
@@ -13,6 +14,9 @@ specifiers:
   prettier: 2.7.1
   typescript: 4.7.4
   unbuild: 0.7.4
+
+dependencies:
+  cac: 6.7.12
 
 devDependencies:
   '@types/node': 14.18.21
@@ -696,6 +700,11 @@ packages:
     resolution: {integrity: sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==}
     engines: {node: '>=6'}
     dev: true
+
+  /cac/6.7.12:
+    resolution: {integrity: sha512-rM7E2ygtMkJqD9c7WnFU6fruFcN3xe4FM5yUmgxhZzIKJk4uHl9U/fhwdajGFQbQuv43FAUo1Fe8gX/oIKDeSA==}
+    engines: {node: '>=8'}
+    dev: false
 
   /call-bind/1.0.2:
     resolution: {integrity: sha512-7O+FbCihrB5WGbFYesctwmTKae6rOiIzmz1icreWJ+0aA7LJfuqhEso2T9ncpcFtzMQtzXf2QGGueWJGTYsqrA==}
