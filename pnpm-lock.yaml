@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@hideoo/eslint-config': 0.0.4
+  '@hideoo/prettier-config': 0.0.1
   '@types/node': 14.18.21
   cac: 6.7.12
   eslint: 8.18.0
@@ -16,6 +17,7 @@ dependencies:
 
 devDependencies:
   '@hideoo/eslint-config': 0.0.4_b5e7v2qnwxfo6hmiq56u52mz3e
+  '@hideoo/prettier-config': 0.0.1
   '@types/node': 14.18.21
   eslint: 8.18.0
   husky: 8.0.1
@@ -319,6 +321,10 @@ packages:
       - eslint-import-resolver-webpack
       - supports-color
       - typescript
+    dev: true
+
+  /@hideoo/prettier-config/0.0.1:
+    resolution: {integrity: sha512-+YgIQ4P4iAYmhWHAWpxgnYEHZBjymCG3YFRZHN2zJr5c9z7j0gmzaXgOA5CdxWNmZr+qHY0QrNWCIoZf2B9CKg==}
     dev: true
 
   /@humanwhocodes/config-array/0.9.5:
