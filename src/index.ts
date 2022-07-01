@@ -1,5 +1,5 @@
 function test(msg: string) {
-  console.log(msg)
+  console.error(msg)
 }
 
 test('Hello World!')
