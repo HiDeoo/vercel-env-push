@@ -1,5 +1,22 @@
-function test(msg: string) {
-  console.error(msg)
-}
+import { validateEnvironments } from './environment'
 
-test('Hello World!')
+// TODO(HiDeoo) Type options - allow undefined?
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function pushEnvironmentVariables(_file: string, environments: string[], _options: unknown) {
+  // TODO(HiDeoo) Validate envs
+  validateEnvironments(environments)
+
+  // TODO(HiDeoo) Display envs
+
+  // TODO(HiDeoo) Check file exists and is readable?
+
+  // TODO(HiDeoo) Display file name or maybe complete path
+
+  // TODO(HiDeoo) Parse env with expand
+
+  // TODO(HiDeoo) Display enviroment variables
+
+  // TODO(HiDeoo) Check if dry run and cancel if yes
+
+  // TODO(HiDeoo) Push enviroment variables
+}
