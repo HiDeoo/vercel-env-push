@@ -1,13 +1,15 @@
 import { validateEnvs } from './env'
+import { validateFile } from './files'
 
-// TODO(HiDeoo) Type options - allow undefined?
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function pushEnvVars(_file: string, envs: string[], _options?: unknown) {
+export function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
+  // FIXME(HiDeoo)
+  console.warn('🚨 [index.ts:7] options', options)
+
   validateEnvs(envs)
 
   // TODO(HiDeoo) Display envs
 
-  // TODO(HiDeoo) Check file exists and is readable?
+  validateFile(envFilePath)
 
   // TODO(HiDeoo) Display file name or maybe complete path
 
@@ -18,4 +20,8 @@ export function pushEnvVars(_file: string, envs: string[], _options?: unknown) {
   // TODO(HiDeoo) Check if dry run and cancel if yes
 
   // TODO(HiDeoo) Push enviroment variables
+}
+
+interface Options {
+  dryRun?: boolean
 }
