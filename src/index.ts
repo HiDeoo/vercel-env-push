@@ -1,10 +1,9 @@
-import { validateEnvironments } from './environment'
+import { validateEnvs } from './env'
 
 // TODO(HiDeoo) Type options - allow undefined?
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function pushEnvironmentVariables(_file: string, environments: string[], _options: unknown) {
-  // TODO(HiDeoo) Validate envs
-  validateEnvironments(environments)
+export function pushEnvVars(_file: string, envs: string[], _options?: unknown) {
+  validateEnvs(envs)
 
   // TODO(HiDeoo) Display envs
 

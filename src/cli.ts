@@ -2,11 +2,13 @@ import cac from 'cac'
 
 import { version } from '../package.json'
 
-import { pushEnvironmentVariables } from '.'
+import { pushEnvVars } from '.'
 
 const cli = cac('vercel-env-push')
 
 cli.version(version).help()
+
+// TODO(HiDeoo) List possible env accepted values
 
 cli
   .command('<file> <env> [...otherEnvs]')
@@ -18,7 +20,7 @@ cli
     console.log('🚨 [cli.ts:18] otherEnvs', otherEnvs)
     console.log('🚨 [cli.ts:19] options', options)
 
-    pushEnvironmentVariables(file, [env, ...otherEnvs], options)
+    pushEnvVars(file, [env, ...otherEnvs], options)
   })
 
 try {
