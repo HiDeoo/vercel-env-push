@@ -1,22 +1,31 @@
-import { validateEnvironments } from './environment'
+import { parseEnvFile, validateFile } from './file'
+import { pushEnvVar, validateVercelEnvs } from './vercel'
 
-// TODO(HiDeoo) Type options - allow undefined?
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function pushEnvironmentVariables(_file: string, environments: string[], _options: unknown) {
-  // TODO(HiDeoo) Validate envs
-  validateEnvironments(environments)
+export async function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
+  // FIXME(HiDeoo)
+  console.warn('🚨 [index.ts:7] options', options)
+
+  validateVercelEnvs(envs)
 
   // TODO(HiDeoo) Display envs
 
-  // TODO(HiDeoo) Check file exists and is readable?
+  validateFile(envFilePath)
 
   // TODO(HiDeoo) Display file name or maybe complete path
 
-  // TODO(HiDeoo) Parse env with expand
+  const envVars = parseEnvFile(envFilePath)
 
   // TODO(HiDeoo) Display enviroment variables
 
   // TODO(HiDeoo) Check if dry run and cancel if yes
 
-  // TODO(HiDeoo) Push enviroment variables
+  // TODO(HiDeoo) Wait for confirmation (except if -f or something)
+
+  for (const [envVarKey, envVarValue] of Object.entries(envVars)) {
+    await pushEnvVar(envs, envVarKey, envVarValue)
+  }
+}
+
+interface Options {
+  dryRun?: boolean
 }

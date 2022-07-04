@@ -16,11 +16,15 @@
   "scripts": {
     "dev": "unbuild --stub",
     "build": "unbuild",
+    "test": "vitest",
     "lint": "prettier -c . && eslint . --max-warnings=0 && tsc --noEmit",
     "prepare": "husky install"
   },
   "dependencies": {
-    "cac": "6.7.12"
+    "cac": "6.7.12",
+    "dotenv": "16.0.1",
+    "dotenv-expand": "8.0.3",
+    "execa": "6.1.0"
   },
   "devDependencies": {
     "@hideoo/eslint-config": "0.0.4",
@@ -31,7 +35,8 @@
     "lint-staged": "13.0.3",
     "prettier": "2.7.1",
     "typescript": "4.7.4",
-    "unbuild": "0.7.4"
+    "unbuild": "0.7.4",
+    "vitest": "0.17.0"
   },
   "packageManager": "pnpm@7.4.0",
   "engines": {
