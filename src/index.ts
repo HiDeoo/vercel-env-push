@@ -13,7 +13,6 @@ export function pushEnvVars(envFilePath: string, envs: string[], options?: Optio
 
   // TODO(HiDeoo) Display file name or maybe complete path
 
-  // TODO(HiDeoo) Parse env with expand
   parseEnvFile(envFilePath)
 
   // TODO(HiDeoo) Display enviroment variables

@@ -6,6 +6,7 @@ specifiers:
   '@types/node': 14.18.21
   cac: 6.7.12
   dotenv: 16.0.1
+  dotenv-expand: 8.0.3
   eslint: 8.18.0
   husky: 8.0.1
   lint-staged: 13.0.3
@@ -17,6 +18,7 @@ specifiers:
 dependencies:
   cac: 6.7.12
   dotenv: 16.0.1
+  dotenv-expand: 8.0.3
 
 devDependencies:
   '@hideoo/eslint-config': 0.0.4_b5e7v2qnwxfo6hmiq56u52mz3e
@@ -1073,6 +1075,11 @@ packages:
     dependencies:
       esutils: 2.0.3
     dev: true
+
+  /dotenv-expand/8.0.3:
+    resolution: {integrity: sha512-SErOMvge0ZUyWd5B0NXMQlDkN+8r+HhVUsxgOO7IoPDOdDRD2JjExpN6y3KnFR66jsJMwSn1pqIivhU5rcJiNg==}
+    engines: {node: '>=12'}
+    dev: false
 
   /dotenv/16.0.1:
     resolution: {integrity: sha512-1K6hR6wtk2FviQ4kEiSjFiH5rpzEVi8WW0x96aztHVMhEspNpc4DVOUTEHtEva5VThQ8IaBX1Pe4gSzpVVUsKQ==}

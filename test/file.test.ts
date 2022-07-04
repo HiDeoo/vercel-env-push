@@ -14,4 +14,10 @@ describe('file', () => {
       '"No environment variables found in \'./test/fixtures/.env.empty\'."'
     )
   })
+
+  test('should throw if an environment variable fails to expand', () => {
+    expect(() => pushEnvVars('./test/fixtures/.env.expand.error', ['production'])).toThrowErrorMatchingInlineSnapshot(
+      '"Unable to parse and expand environment variables in \'./test/fixtures/.env.expand.error\'."'
+    )
+  })
 })
