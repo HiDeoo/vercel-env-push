@@ -1,5 +1,5 @@
 import { validateEnvs } from './env'
-import { validateFile } from './files'
+import { parseEnvFile, validateFile } from './file'
 
 export function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
   // FIXME(HiDeoo)
@@ -14,10 +14,13 @@ export function pushEnvVars(envFilePath: string, envs: string[], options?: Optio
   // TODO(HiDeoo) Display file name or maybe complete path
 
   // TODO(HiDeoo) Parse env with expand
+  parseEnvFile(envFilePath)
 
   // TODO(HiDeoo) Display enviroment variables
 
   // TODO(HiDeoo) Check if dry run and cancel if yes
+
+  // TODO(HiDeoo) Wait for confirmation (except if -f or something)
 
   // TODO(HiDeoo) Push enviroment variables
 }
