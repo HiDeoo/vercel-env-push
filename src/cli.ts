@@ -13,14 +13,14 @@ cli.version(version).help()
 cli
   .command('<file> <env> [...otherEnvs]')
   .option('--dry, --dry-run', 'List environment variables without pushing them')
-  .action((file: string, env: string, otherEnvs: string[], options: CliOptions) => {
+  .action(async (file: string, env: string, otherEnvs: string[], options: CliOptions) => {
     // FIXME(HiDeoo)
     console.log(`🚨 [cli.ts:16] file "${file}"`)
     console.log('🚨 [cli.ts:17] env', env)
     console.log('🚨 [cli.ts:18] otherEnvs', otherEnvs)
     console.log('🚨 [cli.ts:19] options', options)
 
-    pushEnvVars(file, [env, ...otherEnvs], options)
+    await pushEnvVars(file, [env, ...otherEnvs], options)
   })
 
 try {

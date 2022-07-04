@@ -1,11 +1,11 @@
-import { validateEnvs } from './env'
 import { parseEnvFile, validateFile } from './file'
+import { pushEnvVar, validateVercelEnvs } from './vercel'
 
-export function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
+export async function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
   // FIXME(HiDeoo)
   console.warn('🚨 [index.ts:7] options', options)
 
-  validateEnvs(envs)
+  validateVercelEnvs(envs)
 
   // TODO(HiDeoo) Display envs
 
@@ -13,7 +13,7 @@ export function pushEnvVars(envFilePath: string, envs: string[], options?: Optio
 
   // TODO(HiDeoo) Display file name or maybe complete path
 
-  parseEnvFile(envFilePath)
+  const envVars = parseEnvFile(envFilePath)
 
   // TODO(HiDeoo) Display enviroment variables
 
@@ -21,7 +21,9 @@ export function pushEnvVars(envFilePath: string, envs: string[], options?: Optio
 
   // TODO(HiDeoo) Wait for confirmation (except if -f or something)
 
-  // TODO(HiDeoo) Push enviroment variables
+  for (const [envVarKey, envVarValue] of Object.entries(envVars)) {
+    await pushEnvVar(envs, envVarKey, envVarValue)
+  }
 }
 
 interface Options {
