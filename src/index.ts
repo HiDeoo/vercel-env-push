@@ -17,9 +17,11 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
 
   // TODO(HiDeoo) Display enviroment variables
 
-  // TODO(HiDeoo) Check if dry run and cancel if yes
+  if (options?.dryRun) {
+    return
+  }
 
-  // TODO(HiDeoo) Wait for confirmation (except if -f or something)
+  // TODO(HiDeoo) Wait for confirmation (except if -y or something)
 
   for (const [envVarKey, envVarValue] of Object.entries(envVars)) {
     await pushEnvVar(envs, envVarKey, envVarValue)

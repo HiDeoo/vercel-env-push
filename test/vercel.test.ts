@@ -47,13 +47,13 @@ describe('env var', () => {
   ])('should push environment variables to %i environment(s)', async (_count, envs) => {
     await pushEnvVars('test/fixtures/.env.test', envs)
 
-    const spy = vi.mocked(execa)
-
     const expected = [
       ['keyA', 'valueA'],
       ['keyAExpanded', 'valueA'],
       ['keyB', 'valueB'],
     ] as const
+
+    const spy = vi.mocked(execa)
 
     // The call count starts at 1.
     let index = 1
@@ -64,5 +64,13 @@ describe('env var', () => {
         expect(spy).toHaveBeenNthAddEnvCall(index++, env, key, value)
       }
     }
+  })
+
+  test('should not push environment variables with the dry option', async () => {
+    await pushEnvVars('test/fixtures/.env.test', ['production'], { dryRun: true })
+
+    const spy = vi.mocked(execa)
+
+    expect(spy).not.toHaveBeenCalled()
   })
 })
