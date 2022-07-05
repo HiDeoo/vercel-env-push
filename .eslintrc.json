@@ -1,3 +1,11 @@
 {
-  "extends": ["@hideoo"]
+  "extends": ["@hideoo"],
+  "overrides": [
+    {
+      "files": ["prompt.*", "cli.*", "scripts/**/*.*"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }
