@@ -7,12 +7,14 @@ import * as prompt from '../src/prompt'
 
 describe('prompt', () => {
   let confirmSpy: SpyInstance<Parameters<typeof prompt.confirm>, ReturnType<typeof prompt.confirm>>
+  let tableSpy: SpyInstance<Parameters<typeof prompt.table>, ReturnType<typeof prompt.table>>
   let textSpy: SpyInstance<Parameters<typeof prompt.text>, ReturnType<typeof prompt.text>>
 
   beforeAll(() => {
     vi.mock('execa', () => ({ execa: vi.fn() }))
 
     confirmSpy = vi.spyOn(prompt, 'confirm')
+    tableSpy = vi.spyOn(prompt, 'table').mockImplementation(() => '')
     textSpy = vi.spyOn(prompt, 'text').mockImplementation(() => '')
   })
 
@@ -66,5 +68,54 @@ describe('prompt', () => {
     expect(textSpy.mock.calls[0]?.[0](kolorist)).toMatchInlineSnapshot(
       '"Preparing environment variables push from \'test/fixtures/.env.test\' to development, preview, & production."'
     )
+  })
+
+  test('should log redacted environment variables in interactive mode', async () => {
+    confirmSpy.mockReturnValueOnce(Promise.resolve(true))
+
+    await pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
+
+    expect(textSpy.mock.calls[1]?.[0](kolorist)).toMatchInlineSnapshot(`
+      "
+      The following environment variable(s) will be pushed:"
+    `)
+
+    expect(tableSpy).toHaveBeenCalledOnce()
+    expect(tableSpy.mock.calls[0]?.[0](kolorist)).toMatchInlineSnapshot(`
+      [
+        [
+          "Variable",
+          "Value",
+        ],
+        [
+          [
+            "keyA",
+            "v****A",
+          ],
+          [
+            "keyAExpanded",
+            "v****A",
+          ],
+          [
+            "keyB",
+            "v****B",
+          ],
+        ],
+      ]
+    `)
+  })
+})
+
+describe('redact', () => {
+  test.each([
+    ['a', '*'],
+    ['ab', '**'],
+    ['abc', '***'],
+    ['abcd', '****'],
+    ['abcde', 'a***e'],
+    ['abcdefghijklmnopqrstuvwxyz', `a${'*'.repeat(24)}z`],
+    ['12345', '1***5'],
+  ])("should properly redact '%s'", async (value, redactedValue) => {
+    expect(prompt.redact(value)).toBe(redactedValue)
   })
 })

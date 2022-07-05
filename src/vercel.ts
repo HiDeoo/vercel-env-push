@@ -1,7 +1,5 @@
 import assert from 'node:assert'
 
-import { execa } from 'execa'
-
 const vercelEnvs = ['development', 'preview', 'production'] as const
 
 export function validateVercelEnvs(envs: string[]): asserts envs is VercelEnv[] {
@@ -37,7 +35,7 @@ async function removeEnvVar(env: VercelEnv, key: string) {
   }
 }
 
-function executeCommandWithNpx(command: string, ...args: string[]) {
+async function executeCommandWithNpx(command: string, ...args: string[]) {
   const execaArgs: string[] = []
 
   if (command === 'npx') {
@@ -51,6 +49,8 @@ function executeCommandWithNpx(command: string, ...args: string[]) {
       execaArgs.push('--yes')
     }
   }
+
+  const { execa } = await import('execa')
 
   return execa(command, execaArgs, { shell: true })
 }

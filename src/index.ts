@@ -1,5 +1,5 @@
 import { parseEnvFile, validateFile } from './file'
-import { confirm, text } from './prompt'
+import { confirm, redact, table, text } from './prompt'
 import { pushEnvVar, validateVercelEnvs } from './vercel'
 
 export async function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
@@ -19,14 +19,20 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
 
   const envVars = parseEnvFile(envFilePath)
 
-  // TODO(HiDeoo) Display enviroment variables
+  if (options?.interactive) {
+    text(({ dim }) => dim('\nThe following environment variable(s) will be pushed:'))
+    table(({ bold }) => [
+      [bold('Variable'), bold('Value')],
+      Object.entries(envVars).map(([key, value]) => [key, redact(value)]),
+    ])
+  }
 
   if (options?.dryRun) {
     return
   }
 
   if (options?.interactive) {
-    const confirmed = await confirm('Do the thing????')
+    const confirmed = await confirm('\nDo you want to push these environment variable(s)?')
 
     if (!confirmed) {
       throw new Error('User aborted.')

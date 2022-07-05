@@ -1,9 +1,31 @@
 import readline from 'node:readline'
 
+import Table from 'cli-table3'
 import * as kolorist from 'kolorist'
 
-export function text(colorizer: (colors: typeof kolorist) => string) {
-  console.log(colorizer(kolorist))
+export function text(builder: (colors: typeof kolorist) => string) {
+  console.log(builder(kolorist))
+}
+
+export function table(builder: (colors: typeof kolorist) => [headers: string[], values: string[][]]) {
+  const [headers, values] = builder(kolorist)
+
+  const table = new Table({
+    head: headers,
+    style: { head: [] },
+  })
+
+  table.push(...values)
+
+  console.log(table.toString())
+}
+
+export function redact(value: string) {
+  if (value.length < 5) {
+    return '*'.repeat(value.length)
+  }
+
+  return value[0] + '*'.repeat(value.length - 2) + value[value.length - 1]
 }
 
 export function confirm(question: string, defaultYes = true) {
