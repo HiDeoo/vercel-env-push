@@ -1,4 +1,5 @@
 import { parseEnvFile, validateFile } from './file'
+import { confirm } from './prompt'
 import { pushEnvVar, validateVercelEnvs } from './vercel'
 
 export async function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
@@ -21,7 +22,13 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
     return
   }
 
-  // TODO(HiDeoo) Wait for confirmation (except if -y or something)
+  if (options?.interactive) {
+    const confirmed = await confirm('Do the thing????')
+
+    if (!confirmed) {
+      throw new Error('User aborted.')
+    }
+  }
 
   for (const [envVarKey, envVarValue] of Object.entries(envVars)) {
     await pushEnvVar(envs, envVarKey, envVarValue)
@@ -30,4 +37,5 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
 
 interface Options {
   dryRun?: boolean
+  interactive?: boolean
 }

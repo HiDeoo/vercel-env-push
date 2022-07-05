@@ -20,7 +20,7 @@ cli
     console.log('🚨 [cli.ts:18] otherEnvs', otherEnvs)
     console.log('🚨 [cli.ts:19] options', options)
 
-    await pushEnvVars(file, [env, ...otherEnvs], options)
+    await pushEnvVars(file, [env, ...otherEnvs], { ...options, interactive: true })
   })
 
 try {

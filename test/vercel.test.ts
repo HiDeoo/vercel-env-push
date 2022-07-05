@@ -2,6 +2,7 @@ import { execa } from 'execa'
 import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from 'vitest'
 
 import { pushEnvVars } from '../src'
+import * as prompt from '../src/prompt'
 
 describe('env', () => {
   test('should throw if no environments are provided', async () => {
@@ -53,15 +54,15 @@ describe('env var', () => {
       ['keyB', 'valueB'],
     ] as const
 
-    const spy = vi.mocked(execa)
+    const execaSpy = vi.mocked(execa)
 
     // The call count starts at 1.
     let index = 1
 
     for (const [key, value] of expected) {
       for (const env of envs) {
-        expect(spy).toHaveBeenNthRemoveEnvCall(index++, env, key)
-        expect(spy).toHaveBeenNthAddEnvCall(index++, env, key, value)
+        expect(execaSpy).toHaveBeenNthRemoveEnvCall(index++, env, key)
+        expect(execaSpy).toHaveBeenNthAddEnvCall(index++, env, key, value)
       }
     }
   })
@@ -69,8 +70,34 @@ describe('env var', () => {
   test('should not push environment variables with the dry option', async () => {
     await pushEnvVars('test/fixtures/.env.test', ['production'], { dryRun: true })
 
-    const spy = vi.mocked(execa)
+    const execaSpy = vi.mocked(execa)
 
-    expect(spy).not.toHaveBeenCalled()
+    expect(execaSpy).not.toHaveBeenCalled()
+  })
+
+  test('should not push environment variables in interactive mode with no confirmation', async () => {
+    const confirmSpy = vi.spyOn(prompt, 'confirm').mockReturnValueOnce(Promise.resolve(false))
+
+    await expect(
+      pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
+    ).rejects.toThrowErrorMatchingInlineSnapshot('"User aborted."')
+
+    const execaSpy = vi.mocked(execa)
+
+    expect(execaSpy).not.toHaveBeenCalled()
+
+    confirmSpy.mockRestore()
+  })
+
+  test('should push environment variables in interactive mode with a confirmation', async () => {
+    const confirmSpy = vi.spyOn(prompt, 'confirm').mockReturnValueOnce(Promise.resolve(true))
+
+    await pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
+
+    const execaSpy = vi.mocked(execa)
+
+    expect(execaSpy).toHaveBeenCalledTimes(6)
+
+    confirmSpy.mockRestore()
   })
 })
