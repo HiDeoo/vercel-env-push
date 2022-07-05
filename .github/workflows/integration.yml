@@ -51,3 +51,5 @@ jobs:
 
       - name: Test
         run: pnpm test
+        env:
+          NODE_DISABLE_COLORS: 1
