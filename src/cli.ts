@@ -1,4 +1,5 @@
 import cac from 'cac'
+import { red } from 'kolorist'
 
 import { version } from '../package.json'
 
@@ -20,10 +21,7 @@ cli
 try {
   cli.parse()
 } catch (error) {
-  if (error instanceof Error) {
-    // TODO(HiDeoo) Display error message properly
-    console.error('🚨 [cli.ts:24] error', error, '\n\n')
-  }
+  console.error(red(`Something went wrong: ${error instanceof Error ? error.message : error}\n`))
 
   cli.outputHelp()
 
