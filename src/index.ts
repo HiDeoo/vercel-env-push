@@ -3,9 +3,6 @@ import { confirm } from './prompt'
 import { pushEnvVar, validateVercelEnvs } from './vercel'
 
 export async function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
-  // FIXME(HiDeoo)
-  console.warn('🚨 [index.ts:7] options', options)
-
   validateVercelEnvs(envs)
 
   // TODO(HiDeoo) Display envs
