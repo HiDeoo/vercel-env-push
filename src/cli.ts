@@ -7,9 +7,11 @@ import { pushEnvVars } from '.'
 
 const cli = cac('vercel-env-push')
 
-cli.version(version).help()
-
-// TODO(HiDeoo) List possible env accepted values
+cli.version(version).help((sections) => {
+  sections.splice(3, 0, {
+    body: 'Environments: development - preview - production',
+  })
+})
 
 cli
   .command('<file> <env> [...otherEnvs]')
