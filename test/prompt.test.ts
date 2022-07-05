@@ -52,13 +52,13 @@ describe('prompt', () => {
     expect(execaSpy).toHaveBeenCalledTimes(6)
   })
 
-  test('should not log anything in interactive mode', async () => {
+  test('should not log anything in non-interactive mode', async () => {
     await pushEnvVars('test/fixtures/.env.test', ['production'])
 
-    expect(confirmSpy).not.toHaveBeenCalled()
+    expect(textSpy).not.toHaveBeenCalled()
   })
 
-  test('should log the environment file path and push environments', async () => {
+  test('should log the environment file path and push environments in interactive mode', async () => {
     confirmSpy.mockReturnValueOnce(Promise.resolve(true))
 
     await pushEnvVars('test/fixtures/.env.test', ['development', 'preview', 'production'], { interactive: true })
