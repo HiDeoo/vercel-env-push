@@ -40,22 +40,29 @@ describe('env var', () => {
     vi.clearAllMocks()
   })
 
-  test('should push environment variables to a single environment', async () => {
-    const env = 'production'
-
-    await pushEnvVars('test/fixtures/.env.test', [env])
+  test.each([
+    [1, ['production']],
+    [2, ['preview', 'production']],
+    [3, ['development', 'preview', 'production']],
+  ])('should push environment variables to %i environment(s)', async (_count, envs) => {
+    await pushEnvVars('test/fixtures/.env.test', envs)
 
     const spy = vi.mocked(execa)
 
-    expect(spy).toHaveBeenCalledTimes(6)
+    const expected = [
+      ['keyA', 'valueA'],
+      ['keyAExpanded', 'valueA'],
+      ['keyB', 'valueB'],
+    ] as const
 
-    expect(spy).toHaveBeenNthRemoveEnvCall(1, env, 'keyA')
-    expect(spy).toHaveBeenNthAddEnvCall(2, env, 'keyA', 'valueA')
+    // The call count starts at 1.
+    let index = 1
 
-    expect(spy).toHaveBeenNthRemoveEnvCall(3, env, 'keyAExpanded')
-    expect(spy).toHaveBeenNthAddEnvCall(4, env, 'keyAExpanded', 'valueA')
-
-    expect(spy).toHaveBeenNthRemoveEnvCall(5, env, 'keyB')
-    expect(spy).toHaveBeenNthAddEnvCall(6, env, 'keyB', 'valueB')
+    for (const [key, value] of expected) {
+      for (const env of envs) {
+        expect(spy).toHaveBeenNthRemoveEnvCall(index++, env, key)
+        expect(spy).toHaveBeenNthAddEnvCall(index++, env, key, value)
+      }
+    }
   })
 })
