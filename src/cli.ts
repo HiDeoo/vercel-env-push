@@ -20,15 +20,19 @@ cli
     await pushEnvVars(file, [env, ...otherEnvs], { ...options, interactive: true })
   })
 
-try {
-  cli.parse()
-} catch (error) {
-  console.error(red(`Something went wrong: ${error instanceof Error ? error.message : error}\n`))
+async function run() {
+  try {
+    cli.parse(process.argv, { run: false })
 
-  cli.outputHelp()
+    await cli.runMatchedCommand()
+  } catch (error) {
+    console.error(red(`Something went wrong: ${error instanceof Error ? error.message : error}\n`))
 
-  process.exit(1)
+    process.exit(1)
+  }
 }
+
+run()
 
 interface CliOptions {
   dryRun?: boolean
