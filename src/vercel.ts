@@ -11,8 +11,15 @@ export function validateVercelEnvs(envs: string[]): asserts envs is VercelEnv[] 
   )
 }
 
-export async function pushEnvVar(envs: VercelEnv[], key: string, value: string) {
+export async function pushEnvVar(
+  envs: VercelEnv[],
+  key: string,
+  value: string,
+  onPush: (env: VercelEnv, key: string) => void
+) {
   for (const env of envs) {
+    onPush(env, key)
+
     await removeEnvVar(env, key)
     await addEnvVar(env, key, value)
   }

@@ -1,5 +1,6 @@
 import { execa } from 'execa'
 import * as kolorist from 'kolorist'
+import ora from 'ora'
 import { afterAll, afterEach, beforeAll, describe, expect, type SpyInstance, test, vi } from 'vitest'
 
 import { pushEnvVars } from '../src'
@@ -12,6 +13,7 @@ describe('prompt', () => {
 
   beforeAll(() => {
     vi.mock('execa', () => ({ execa: vi.fn() }))
+    vi.mock('ora', () => ({ default: vi.fn().mockImplementation(() => ({ start: vi.fn() })) }))
 
     confirmSpy = vi.spyOn(prompt, 'confirm')
     tableSpy = vi.spyOn(prompt, 'table').mockImplementation(() => '')
@@ -103,6 +105,24 @@ describe('prompt', () => {
         ],
       ]
     `)
+  })
+
+  test('should not show a spinner in non-interactive mode', async () => {
+    await pushEnvVars('test/fixtures/.env.test', ['production'])
+
+    const spinSpy = vi.mocked(ora)
+
+    expect(spinSpy).not.toHaveBeenCalled()
+  })
+
+  test('should show a spinner in interactive mode', async () => {
+    confirmSpy.mockReturnValueOnce(Promise.resolve(true))
+
+    await pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
+
+    const spinSpy = vi.mocked(ora)
+
+    expect(spinSpy).toHaveBeenCalledOnce()
   })
 })
 

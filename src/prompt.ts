@@ -2,6 +2,7 @@ import readline from 'node:readline'
 
 import Table from 'cli-table3'
 import * as kolorist from 'kolorist'
+import { type Ora } from 'ora'
 
 export function text(builder: (colors: typeof kolorist) => string) {
   console.log(builder(kolorist))
@@ -28,6 +29,12 @@ export function redact(value: string) {
   return value[0] + '*'.repeat(value.length - 2) + value[value.length - 1]
 }
 
+export async function spin() {
+  const { default: ora } = await import('ora')
+
+  return ora({ color: 'cyan' }).start()
+}
+
 export function confirm(question: string, defaultYes = true) {
   const rl = readline.createInterface({
     input: process.stdin,
@@ -39,6 +46,8 @@ export function confirm(question: string, defaultYes = true) {
 
     rl.question(`${question} (${answers[0]}/${answers[1]}) `, (answer) => {
       rl.close()
+
+      console.log('\n')
 
       const sanitizedAnswer = answer.trim().toLowerCase()
 
@@ -54,3 +63,5 @@ export function confirm(question: string, defaultYes = true) {
 function getConfirmAnswers(defaultYes = true): [string, string] {
   return [defaultYes ? 'Y' : 'y', !defaultYes ? 'N' : 'n']
 }
+
+export type Spinner = Ora
