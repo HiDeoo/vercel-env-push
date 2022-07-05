@@ -1,5 +1,11 @@
 import readline from 'node:readline'
 
+import * as kolorist from 'kolorist'
+
+export function text(colorizer: (colors: typeof kolorist) => string) {
+  console.log(colorizer(kolorist))
+}
+
 export function confirm(question: string, defaultYes = true) {
   const rl = readline.createInterface({
     input: process.stdin,

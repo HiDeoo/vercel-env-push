@@ -1,15 +1,21 @@
 import { parseEnvFile, validateFile } from './file'
-import { confirm } from './prompt'
+import { confirm, text } from './prompt'
 import { pushEnvVar, validateVercelEnvs } from './vercel'
 
 export async function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
   validateVercelEnvs(envs)
 
-  // TODO(HiDeoo) Display envs
-
   validateFile(envFilePath)
 
-  // TODO(HiDeoo) Display file name or maybe complete path
+  if (options?.interactive) {
+    text(({ cyan }) => {
+      const formatter = new Intl.ListFormat('en', { style: 'short', type: 'conjunction' })
+
+      return `Preparing environment variables push from ${cyan(`'${envFilePath}'`)} to ${formatter.format(
+        envs.map((env) => cyan(env))
+      )}.`
+    })
+  }
 
   const envVars = parseEnvFile(envFilePath)
 
