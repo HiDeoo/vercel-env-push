@@ -30,4 +30,4 @@ export function parseEnvFile(envFilePath: string): EnvVars {
   }
 }
 
-type EnvVars = Record<string, string>
+export type EnvVars = Record<string, string>

@@ -1,5 +1,7 @@
 import assert from 'node:assert'
 
+import { type EnvVars } from './file'
+
 const vercelEnvs = ['development', 'preview', 'production'] as const
 
 export function validateVercelEnvs(envs: string[]): asserts envs is VercelEnv[] {
@@ -11,18 +13,33 @@ export function validateVercelEnvs(envs: string[]): asserts envs is VercelEnv[] 
   )
 }
 
-export async function pushEnvVar(
-  envs: VercelEnv[],
-  key: string,
-  value: string,
-  onPush: (env: VercelEnv, key: string) => void
-) {
-  for (const env of envs) {
-    onPush(env, key)
+export async function replaceEnvVars(envs: VercelEnv[], envVars: EnvVars) {
+  await removeEnvVars(envs, envVars)
+  await addEnvVars(envs, envVars)
+}
 
-    await removeEnvVar(env, key)
-    await addEnvVar(env, key, value)
+async function removeEnvVars(envs: VercelEnv[], envVars: EnvVars) {
+  const promises: Promise<void>[] = []
+
+  for (const envVarKey of Object.keys(envVars)) {
+    for (const env of envs) {
+      promises.push(removeEnvVar(env, envVarKey))
+    }
   }
+
+  return Promise.all(promises)
+}
+
+async function addEnvVars(envs: VercelEnv[], envVars: EnvVars) {
+  const promises: Promise<void>[] = []
+
+  for (const [envVarKey, envVarValue] of Object.entries(envVars)) {
+    for (const env of envs) {
+      promises.push(addEnvVar(env, envVarKey, envVarValue))
+    }
+  }
+
+  return Promise.all(promises)
 }
 
 async function addEnvVar(env: VercelEnv, key: string, value: string) {

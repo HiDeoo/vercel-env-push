@@ -1,4 +1,4 @@
-import { execa } from 'execa'
+import { execa, type ExecaChildProcess, type Options as ExecaOptions } from 'execa'
 import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from 'vitest'
 
 import { pushEnvVars } from '../src'
@@ -29,7 +29,7 @@ describe('env', () => {
 
 describe('env var', () => {
   beforeAll(() => {
-    vi.mock('execa', () => ({ execa: vi.fn() }))
+    vi.mock('execa')
   })
 
   afterAll(() => {
@@ -47,22 +47,29 @@ describe('env var', () => {
   ])('should push environment variables to %i environment(s)', async (_count, envs) => {
     await pushEnvVars('test/fixtures/.env.test', envs)
 
-    const expected = [
-      ['keyA', 'valueA'],
-      ['keyAExpanded', 'valueA'],
-      ['keyB', 'valueB'],
-    ] as const
+    const envVars = {
+      keyA: 'valueA',
+      keyAExpanded: 'valueA',
+      keyB: 'valueB',
+    }
 
-    const execaSpy = vi.mocked(execa)
+    const expectedCalls: ExecaParams[] = []
 
-    // The call count starts at 1.
-    let index = 1
-
-    for (const [key, value] of expected) {
+    for (const [envKey, envValue] of Object.entries(envVars)) {
       for (const env of envs) {
-        expect(execaSpy).toHaveBeenNthRemoveEnvCall(index++, env, key)
-        expect(execaSpy).toHaveBeenNthAddEnvCall(index++, env, key, value)
+        expectedCalls.push(
+          ['npx', ['--yes', 'vercel', 'env', 'rm', envKey, env, '-y'], { shell: true }],
+          ['printf', [`"${envValue}"`, '|', 'npx', '--yes', 'vercel', 'env', 'add', envKey, env], { shell: true }]
+        )
       }
+    }
+
+    const execaSpy = vi.mocked<(...params: ExecaParams) => ExecaChildProcess>(execa)
+
+    expect(execaSpy.mock.calls.length).toBe(expectedCalls.length)
+
+    for (const expectedCall of expectedCalls) {
+      expect(execaSpy.mock.calls).toContainEqual(expectedCall)
     }
   })
 
@@ -74,3 +81,5 @@ describe('env var', () => {
     expect(execaSpy).not.toHaveBeenCalled()
   })
 })
+
+type ExecaParams = [file: string, args?: string[], options?: ExecaOptions]

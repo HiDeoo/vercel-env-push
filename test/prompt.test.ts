@@ -12,7 +12,7 @@ describe('prompt', () => {
   let textSpy: SpyInstance<Parameters<typeof prompt.text>, ReturnType<typeof prompt.text>>
 
   beforeAll(() => {
-    vi.mock('execa', () => ({ execa: vi.fn() }))
+    vi.mock('execa')
     vi.mock('ora', () => ({ default: vi.fn().mockImplementation(() => ({ start: vi.fn() })) }))
 
     confirmSpy = vi.spyOn(prompt, 'confirm')

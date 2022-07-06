@@ -29,10 +29,10 @@ export function redact(value: string) {
   return value[0] + '*'.repeat(value.length - 2) + value[value.length - 1]
 }
 
-export async function spin() {
+export async function spin(message: string) {
   const { default: ora } = await import('ora')
 
-  return ora({ color: 'cyan' }).start()
+  return ora({ color: 'cyan', text: message }).start()
 }
 
 export function confirm(question: string, defaultYes = true) {
