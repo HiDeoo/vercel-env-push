@@ -26,7 +26,8 @@
     "dotenv": "16.0.1",
     "dotenv-expand": "8.0.3",
     "kolorist": "1.5.1",
-    "ora": "6.1.2"
+    "ora": "6.1.2",
+    "wyt": "2.0.1"
   },
   "devDependencies": {
     "@hideoo/eslint-config": "0.0.4",

@@ -1,9 +1,13 @@
 import assert from 'node:assert'
 
+import wyt from 'wyt'
+
 import { type EnvVars } from './file'
 import { exec, isExecError, throwIfAnyRejected } from './utils'
 
 const vercelEnvs = ['development', 'preview', 'production'] as const
+
+const rateLimiter = wyt(8, 10_000)
 
 export function validateVercelEnvs(envs: string[]): asserts envs is VercelEnv[] {
   assert(envs.length > 0, 'No environments specified.')
@@ -45,6 +49,8 @@ async function addEnvVars(envs: VercelEnv[], envVars: EnvVars) {
 
 async function addEnvVar(env: VercelEnv, key: string, value: string) {
   try {
+    await rateLimiter()
+
     await execCommandWithNpx(`printf "${value}" | npx vercel env add ${key} ${env}`)
   } catch (error) {
     throw new Error(`Unable to add environment variable '${key}' to '${env}'.`, {
@@ -55,6 +61,8 @@ async function addEnvVar(env: VercelEnv, key: string, value: string) {
 
 async function removeEnvVar(env: VercelEnv, key: string) {
   try {
+    await rateLimiter()
+
     await execCommandWithNpx(`npx vercel env rm ${key} ${env} -y`)
   } catch (error) {
     if (!isExecError(error) || !error.stderr.includes('Environment Variable was not found')) {

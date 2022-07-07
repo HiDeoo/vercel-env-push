@@ -15,6 +15,7 @@ describe('prompt', () => {
 
   beforeAll(() => {
     vi.mock('ora', () => ({ default: vi.fn().mockImplementation(() => ({ start: vi.fn() })) }))
+    vi.mock('wyt')
 
     execSpy = vi.spyOn(utils, 'exec').mockImplementation(vi.fn<[string]>())
 

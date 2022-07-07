@@ -1,4 +1,5 @@
 import { afterAll, afterEach, beforeAll, describe, expect, type SpyInstance, test, vi } from 'vitest'
+import wyt from 'wyt'
 
 import { pushEnvVars } from '../src'
 import * as utils from '../src/utils'
@@ -31,6 +32,8 @@ describe('env var', () => {
   let execSpy: SpyInstance<Parameters<typeof utils.exec>, ReturnType<typeof utils.exec>>
 
   beforeAll(() => {
+    vi.mock('wyt')
+
     execSpy = vi.spyOn(utils, 'exec').mockImplementation(vi.fn<[string]>())
   })
 
@@ -121,5 +124,14 @@ describe('env var', () => {
     )
 
     expect(execSpy).toHaveBeenCalledTimes(6)
+  })
+
+  test.only('should rate limit requests', async () => {
+    await pushEnvVars('test/fixtures/.env.test', ['production'])
+
+    const wytSpy = vi.mocked(wyt)
+    const rateLimiterSpy = vi.mocked(wytSpy.mock.results[0]?.value)
+
+    expect(rateLimiterSpy).toHaveBeenCalledTimes(6)
   })
 })

@@ -17,6 +17,7 @@ specifiers:
   typescript: 4.7.4
   unbuild: 0.7.4
   vitest: 0.17.0
+  wyt: 2.0.1
 
 dependencies:
   cac: 6.7.12
@@ -25,6 +26,7 @@ dependencies:
   dotenv-expand: 8.0.3
   kolorist: 1.5.1
   ora: 6.1.2
+  wyt: 2.0.1
 
 devDependencies:
   '@hideoo/eslint-config': 0.0.4_b5e7v2qnwxfo6hmiq56u52mz3e
@@ -3485,6 +3487,11 @@ packages:
   /wrappy/1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
     dev: true
+
+  /wyt/2.0.1:
+    resolution: {integrity: sha512-gNsX1wq1L+v5fgyqOKN8xz+gJwzRUuK5c5RDJOyRC2dGHzc6EmXj/irsyysjKx4Ij/4dBREgIKMO50vSDUhlHg==}
+    engines: {node: '>=6.10.0'}
+    dev: false
 
   /yallist/4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
