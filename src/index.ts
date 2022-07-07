@@ -20,7 +20,7 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   const envVars = parseEnvFile(envFilePath)
 
   if (options?.interactive) {
-    text(({ dim }) => dim('\nThe following environment variable(s) will be pushed:'))
+    text(({ dim }) => dim('The following environment variable(s) will be pushed:'))
     table(({ bold }) => [
       [bold('Variable'), bold('Value')],
       Object.entries(envVars).map(([key, value]) => [key, redact(value)]),
@@ -32,7 +32,7 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   }
 
   if (options?.interactive) {
-    const confirmed = await confirm('\nDo you want to push these environment variable(s)?')
+    const confirmed = await confirm('Do you want to push these environment variable(s)?')
 
     if (!confirmed) {
       throw new Error('User aborted.')
@@ -50,7 +50,6 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   } catch (error) {
     if (options?.interactive && spinner) {
       spinner.error()
-      text(() => '\n')
     }
 
     throw error

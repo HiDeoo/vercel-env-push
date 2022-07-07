@@ -47,8 +47,6 @@ export function confirm(question: string, defaultYes = true) {
     rl.question(`${question} (${answers[0]}/${answers[1]}) `, (answer) => {
       rl.close()
 
-      console.log('\n')
-
       const sanitizedAnswer = answer.trim().toLowerCase()
 
       if ((sanitizedAnswer === '' && defaultYes) || sanitizedAnswer === 'y' || sanitizedAnswer === 'yes') {

@@ -28,7 +28,7 @@ async function run() {
   } catch (error) {
     const isError = error instanceof Error
 
-    console.error(red(`Something went wrong: ${isError ? error.message : error}\n`))
+    console.error(red(`Something went wrong: ${isError ? error.message : error}`))
 
     if (isError && error.cause) {
       console.error(error.cause)
