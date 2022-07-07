@@ -8,11 +8,19 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   validateFile(envFilePath)
 
   if (options?.interactive) {
-    text(({ cyan }) => {
+    text(({ cyan, green, red, yellow }) => {
       const formatter = new Intl.ListFormat('en', { style: 'short', type: 'conjunction' })
 
       return `Preparing environment variables push from ${cyan(`'${envFilePath}'`)} to ${formatter.format(
-        envs.map((env) => cyan(env))
+        envs.map((env) => {
+          if (env === 'development') {
+            return green(env)
+          } else if (env === 'preview') {
+            return yellow(env)
+          }
+
+          return red(env)
+        })
       )}.`
     })
   }
