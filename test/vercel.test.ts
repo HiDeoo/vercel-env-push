@@ -1,7 +1,8 @@
-import { execa } from 'execa'
-import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, type SpyInstance, test, vi } from 'vitest'
+import wyt from 'wyt'
 
 import { pushEnvVars } from '../src'
+import * as utils from '../src/utils'
 
 describe('env', () => {
   test('should throw if no environments are provided', async () => {
@@ -28,8 +29,12 @@ describe('env', () => {
 })
 
 describe('env var', () => {
+  let execSpy: SpyInstance<Parameters<typeof utils.exec>, ReturnType<typeof utils.exec>>
+
   beforeAll(() => {
-    vi.mock('execa', () => ({ execa: vi.fn() }))
+    vi.mock('wyt')
+
+    execSpy = vi.spyOn(utils, 'exec').mockImplementation(vi.fn<[string]>())
   })
 
   afterAll(() => {
@@ -37,7 +42,10 @@ describe('env var', () => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
+    execSpy.mockClear()
+
+    const rateLimiterMock = vi.mocked(vi.mocked(wyt).mock.results[0]?.value)
+    rateLimiterMock.mockClear()
   })
 
   test.each([
@@ -47,30 +55,85 @@ describe('env var', () => {
   ])('should push environment variables to %i environment(s)', async (_count, envs) => {
     await pushEnvVars('test/fixtures/.env.test', envs)
 
-    const expected = [
-      ['keyA', 'valueA'],
-      ['keyAExpanded', 'valueA'],
-      ['keyB', 'valueB'],
-    ] as const
+    const envVars = {
+      keyA: 'valueA',
+      keyAExpanded: 'valueA',
+      keyB: 'valueB',
+    }
 
-    const execaSpy = vi.mocked(execa)
+    const expectedCommands: string[][] = []
 
-    // The call count starts at 1.
-    let index = 1
-
-    for (const [key, value] of expected) {
+    for (const [envKey, envValue] of Object.entries(envVars)) {
       for (const env of envs) {
-        expect(execaSpy).toHaveBeenNthRemoveEnvCall(index++, env, key)
-        expect(execaSpy).toHaveBeenNthAddEnvCall(index++, env, key, value)
+        expectedCommands.push(
+          [`npx --yes vercel env rm ${envKey} ${env} -y`],
+          [`printf "${envValue}" | npx --yes vercel env add ${envKey} ${env}`]
+        )
       }
+    }
+
+    expect(execSpy.mock.calls.length).toBe(expectedCommands.length)
+
+    for (const expectedCommand of expectedCommands) {
+      expect(execSpy.mock.calls).toContainEqual(expectedCommand)
     }
   })
 
   test('should not push environment variables with the dry option', async () => {
     await pushEnvVars('test/fixtures/.env.test', ['production'], { dryRun: true })
 
-    const execaSpy = vi.mocked(execa)
+    expect(execSpy).not.toHaveBeenCalled()
+  })
 
-    expect(execaSpy).not.toHaveBeenCalled()
+  test('should not try to add environment variables if removing them failed for an unknown reason', async () => {
+    execSpy.mockResolvedValueOnce({ stderr: '', stdout: '' }).mockRejectedValueOnce(new Error('test'))
+
+    await expect(pushEnvVars('test/fixtures/.env.test', ['production'])).rejects.toThrowErrorMatchingInlineSnapshot(
+      "\"Unable to remove environment variable 'keyAExpanded' from 'production'.\""
+    )
+
+    expect(execSpy).toHaveBeenCalledTimes(3)
+  })
+
+  test('should ignore errors related to deleting an unknown environment variables', async () => {
+    class ExecError extends Error {
+      constructor(public stderr: string) {
+        super()
+      }
+    }
+
+    const error = new ExecError('test')
+    error.stderr = 'Environment Variable was not found'
+
+    execSpy.mockResolvedValueOnce({ stderr: '', stdout: '' }).mockRejectedValueOnce(error)
+
+    await pushEnvVars('test/fixtures/.env.test', ['production'])
+
+    expect(execSpy).toHaveBeenCalledTimes(6)
+  })
+
+  test('should throw the first encountered error during a push', async () => {
+    const execResponse = { stderr: '', stdout: '' }
+
+    execSpy
+      .mockResolvedValueOnce(execResponse)
+      .mockResolvedValueOnce(execResponse)
+      .mockResolvedValueOnce(execResponse)
+      .mockResolvedValueOnce(execResponse)
+      .mockRejectedValueOnce(new Error('test'))
+
+    await expect(pushEnvVars('test/fixtures/.env.test', ['production'])).rejects.toThrowErrorMatchingInlineSnapshot(
+      "\"Unable to add environment variable 'keyAExpanded' to 'production'.\""
+    )
+
+    expect(execSpy).toHaveBeenCalledTimes(6)
+  })
+
+  test('should rate limit requests', async () => {
+    await pushEnvVars('test/fixtures/.env.test', ['production'])
+
+    const rateLimiterMock = vi.mocked(vi.mocked(wyt).mock.results[0]?.value)
+
+    expect(rateLimiterMock).toHaveBeenCalledTimes(6)
   })
 })

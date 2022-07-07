@@ -25,9 +25,11 @@ export function parseEnvFile(envFilePath: string): EnvVars {
     }
 
     return parsedEnvVars.parsed
-  } catch {
-    throw new Error(`Unable to parse and expand environment variables in '${envFilePath}'.`)
+  } catch (error) {
+    throw new Error(`Unable to parse and expand environment variables in '${envFilePath}'.`, {
+      cause: error instanceof Error ? error : undefined,
+    })
   }
 }
 
-type EnvVars = Record<string, string>
+export type EnvVars = Record<string, string>

@@ -26,7 +26,13 @@ async function run() {
 
     await cli.runMatchedCommand()
   } catch (error) {
-    console.error(red(`Something went wrong: ${error instanceof Error ? error.message : error}\n`))
+    const isError = error instanceof Error
+
+    console.error(red(`Something went wrong: ${isError ? error.message : error}\n`))
+
+    if (isError && error.cause) {
+      console.error(error.cause)
+    }
 
     process.exit(1)
   }

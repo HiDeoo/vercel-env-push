@@ -1,6 +1,6 @@
 import { parseEnvFile, validateFile } from './file'
 import { confirm, redact, type Spinner, table, text, spin } from './prompt'
-import { pushEnvVar, validateVercelEnvs } from './vercel'
+import { replaceEnvVars, validateVercelEnvs } from './vercel'
 
 export async function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
   validateVercelEnvs(envs)
@@ -42,17 +42,11 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   let spinner: Spinner | undefined
 
   if (options?.interactive) {
-    spinner = await spin()
+    spinner = await spin('Pushing environment variables')
   }
 
   try {
-    for (const [envVarKey, envVarValue] of Object.entries(envVars)) {
-      await pushEnvVar(envs, envVarKey, envVarValue, (env, key) => {
-        if (options?.interactive && spinner) {
-          spinner.text = `Pushing ${key} to ${env}`
-        }
-      })
-    }
+    await replaceEnvVars(envs, envVars)
   } catch (error) {
     if (options?.interactive && spinner) {
       spinner.fail()

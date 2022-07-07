@@ -1,6 +1,13 @@
 import assert from 'node:assert'
 
+import wyt from 'wyt'
+
+import { type EnvVars } from './file'
+import { exec, isExecError, throwIfAnyRejected } from './utils'
+
 const vercelEnvs = ['development', 'preview', 'production'] as const
+
+const rateLimiter = wyt(8, 10_000)
 
 export function validateVercelEnvs(envs: string[]): asserts envs is VercelEnv[] {
   assert(envs.length > 0, 'No environments specified.')
@@ -11,55 +18,63 @@ export function validateVercelEnvs(envs: string[]): asserts envs is VercelEnv[] 
   )
 }
 
-export async function pushEnvVar(
-  envs: VercelEnv[],
-  key: string,
-  value: string,
-  onPush: (env: VercelEnv, key: string) => void
-) {
-  for (const env of envs) {
-    onPush(env, key)
+export async function replaceEnvVars(envs: VercelEnv[], envVars: EnvVars) {
+  await removeEnvVars(envs, envVars)
+  await addEnvVars(envs, envVars)
+}
 
-    await removeEnvVar(env, key)
-    await addEnvVar(env, key, value)
+async function removeEnvVars(envs: VercelEnv[], envVars: EnvVars) {
+  const promises: Promise<void>[] = []
+
+  for (const envVarKey of Object.keys(envVars)) {
+    for (const env of envs) {
+      promises.push(removeEnvVar(env, envVarKey))
+    }
   }
+
+  throwIfAnyRejected(await Promise.allSettled(promises))
+}
+
+async function addEnvVars(envs: VercelEnv[], envVars: EnvVars) {
+  const promises: Promise<void>[] = []
+
+  for (const [envVarKey, envVarValue] of Object.entries(envVars)) {
+    for (const env of envs) {
+      promises.push(addEnvVar(env, envVarKey, envVarValue))
+    }
+  }
+
+  throwIfAnyRejected(await Promise.allSettled(promises))
 }
 
 async function addEnvVar(env: VercelEnv, key: string, value: string) {
   try {
-    // https://stackoverflow.com/a/68039150/1945960
-    await executeCommandWithNpx('printf', `"${value}"`, '|', 'npx', 'vercel', 'env', 'add', key, env)
-  } catch {
-    throw new Error(`Unable to add environment variable '${key}' to '${env}'.`)
+    await rateLimiter()
+
+    await execCommandWithNpx(`printf "${value}" | npx vercel env add ${key} ${env}`)
+  } catch (error) {
+    throw new Error(`Unable to add environment variable '${key}' to '${env}'.`, {
+      cause: error instanceof Error ? error : undefined,
+    })
   }
 }
 
 async function removeEnvVar(env: VercelEnv, key: string) {
   try {
-    await executeCommandWithNpx('npx', 'vercel', 'env', 'rm', key, env, '-y')
-  } catch {
-    // We do not care about errors when removing an enviroment variable as they may simply not exist.
+    await rateLimiter()
+
+    await execCommandWithNpx(`npx vercel env rm ${key} ${env} -y`)
+  } catch (error) {
+    if (!isExecError(error) || !error.stderr.includes('Environment Variable was not found')) {
+      throw new Error(`Unable to remove environment variable '${key}' from '${env}'.`, {
+        cause: error instanceof Error ? error : undefined,
+      })
+    }
   }
 }
 
-async function executeCommandWithNpx(command: string, ...args: string[]) {
-  const execaArgs: string[] = []
-
-  if (command === 'npx') {
-    execaArgs.push('--yes')
-  }
-
-  for (const arg of args) {
-    execaArgs.push(arg)
-
-    if (arg === 'npx') {
-      execaArgs.push('--yes')
-    }
-  }
-
-  const { execa } = await import('execa')
-
-  return execa(command, execaArgs, { shell: true })
+async function execCommandWithNpx(command: string) {
+  return exec(command.replace('npx', 'npx --yes'))
 }
 
 type VercelEnv = typeof vercelEnvs[number]
