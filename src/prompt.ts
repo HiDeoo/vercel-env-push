@@ -2,7 +2,9 @@ import readline from 'node:readline'
 
 import Table from 'cli-table3'
 import * as kolorist from 'kolorist'
-import { type Ora } from 'ora'
+import { createSpinner } from 'nanospinner'
+
+export { type Spinner } from 'nanospinner'
 
 export function text(builder: (colors: typeof kolorist) => string) {
   console.log(builder(kolorist))
@@ -29,10 +31,8 @@ export function redact(value: string) {
   return value[0] + '*'.repeat(value.length - 2) + value[value.length - 1]
 }
 
-export async function spin(message: string) {
-  const { default: ora } = await import('ora')
-
-  return ora({ color: 'cyan', text: message }).start()
+export function spin(message: string) {
+  return createSpinner(message, { color: 'cyan' }).start()
 }
 
 export function confirm(question: string, defaultYes = true) {
@@ -63,5 +63,3 @@ export function confirm(question: string, defaultYes = true) {
 function getConfirmAnswers(defaultYes = true): [string, string] {
   return [defaultYes ? 'Y' : 'y', !defaultYes ? 'N' : 'n']
 }
-
-export type Spinner = Ora

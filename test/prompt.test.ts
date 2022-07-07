@@ -1,5 +1,5 @@
 import * as kolorist from 'kolorist'
-import ora from 'ora'
+import { createSpinner } from 'nanospinner'
 import { afterAll, afterEach, beforeAll, describe, expect, type SpyInstance, test, vi } from 'vitest'
 
 import { pushEnvVars } from '../src'
@@ -10,16 +10,18 @@ describe('prompt', () => {
   let execSpy: SpyInstance<Parameters<typeof utils.exec>, ReturnType<typeof utils.exec>>
 
   let confirmSpy: SpyInstance<Parameters<typeof prompt.confirm>, ReturnType<typeof prompt.confirm>>
+  let spinSpy: SpyInstance<Parameters<typeof prompt.spin>, ReturnType<typeof prompt.spin>>
   let tableSpy: SpyInstance<Parameters<typeof prompt.table>, ReturnType<typeof prompt.table>>
   let textSpy: SpyInstance<Parameters<typeof prompt.text>, ReturnType<typeof prompt.text>>
 
   beforeAll(() => {
-    vi.mock('ora', () => ({ default: vi.fn().mockImplementation(() => ({ start: vi.fn() })) }))
+    vi.mock('nanospinner')
     vi.mock('wyt')
 
     execSpy = vi.spyOn(utils, 'exec').mockImplementation(vi.fn<[string]>())
 
     confirmSpy = vi.spyOn(prompt, 'confirm')
+    spinSpy = vi.spyOn(prompt, 'spin')
     tableSpy = vi.spyOn(prompt, 'table').mockReturnValue()
     textSpy = vi.spyOn(prompt, 'text').mockReturnValue()
   })
@@ -110,9 +112,7 @@ describe('prompt', () => {
   test('should not show a spinner in non-interactive mode', async () => {
     await pushEnvVars('test/fixtures/.env.test', ['production'])
 
-    const spinMock = vi.mocked(ora)
-
-    expect(spinMock).not.toHaveBeenCalled()
+    expect(spinSpy).not.toHaveBeenCalled()
   })
 
   test('should show a spinner in interactive mode', async () => {
@@ -120,9 +120,27 @@ describe('prompt', () => {
 
     await pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
 
-    const spinMock = vi.mocked(ora)
+    expect(spinSpy).toHaveBeenCalledOnce()
 
-    expect(spinMock).toHaveBeenCalledOnce()
+    const spinnerMock = vi.mocked(createSpinner).mock.results[0]?.value
+
+    expect(spinnerMock.start).toHaveBeenCalledOnce()
+    expect(spinnerMock.success).toHaveBeenCalledOnce()
+  })
+
+  test('should show an error symbol instead of a spinner when encountering an error in interactive mode', async () => {
+    execSpy.mockRejectedValueOnce(new Error('test'))
+
+    confirmSpy.mockResolvedValue(true)
+
+    await expect(pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })).rejects.toThrow()
+
+    expect(spinSpy).toHaveBeenCalledOnce()
+
+    const spinnerMock = vi.mocked(createSpinner).mock.results[0]?.value
+
+    expect(spinnerMock.start).toHaveBeenCalledOnce()
+    expect(spinnerMock.error).toHaveBeenCalledOnce()
   })
 })
 

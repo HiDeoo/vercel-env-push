@@ -26,7 +26,7 @@
     "dotenv": "16.0.1",
     "dotenv-expand": "8.0.3",
     "kolorist": "1.5.1",
-    "ora": "6.1.2",
+    "nanospinner": "1.1.0",
     "wyt": "2.0.1"
   },
   "devDependencies": {

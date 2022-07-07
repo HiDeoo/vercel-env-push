@@ -42,14 +42,14 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   let spinner: Spinner | undefined
 
   if (options?.interactive) {
-    spinner = await spin('Pushing environment variables')
+    spinner = spin('Pushing environment variables')
   }
 
   try {
     await replaceEnvVars(envs, envVars)
   } catch (error) {
     if (options?.interactive && spinner) {
-      spinner.fail()
+      spinner.error()
       text(() => '\n')
     }
 
@@ -57,7 +57,9 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   }
 
   if (options?.interactive && spinner) {
-    spinner.succeed(`Pushed ${Object.keys(envVars).length} environment variable(s) to ${envs.length} environment(s).`)
+    spinner.success({
+      text: `Pushed ${Object.keys(envVars).length} environment variable(s) to ${envs.length} environment(s).`,
+    })
   }
 }
 
