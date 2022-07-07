@@ -2,7 +2,9 @@ import readline from 'node:readline'
 
 import Table from 'cli-table3'
 import * as kolorist from 'kolorist'
-import { type Ora } from 'ora'
+import { createSpinner } from 'nanospinner'
+
+export { type Spinner } from 'nanospinner'
 
 export function text(builder: (colors: typeof kolorist) => string) {
   console.log(builder(kolorist))
@@ -29,10 +31,8 @@ export function redact(value: string) {
   return value[0] + '*'.repeat(value.length - 2) + value[value.length - 1]
 }
 
-export async function spin(message: string) {
-  const { default: ora } = await import('ora')
-
-  return ora({ color: 'cyan', text: message }).start()
+export function spin(message: string) {
+  return createSpinner(message, { color: 'cyan' }).start()
 }
 
 export function confirm(question: string, defaultYes = true) {
@@ -41,21 +41,19 @@ export function confirm(question: string, defaultYes = true) {
     output: process.stdout,
   })
 
-  return new Promise<boolean>((resolve) => {
+  return new Promise<void>((resolve, reject) => {
     const answers = getConfirmAnswers(defaultYes)
 
     rl.question(`${question} (${answers[0]}/${answers[1]}) `, (answer) => {
       rl.close()
 
-      console.log('\n')
-
       const sanitizedAnswer = answer.trim().toLowerCase()
 
       if ((sanitizedAnswer === '' && defaultYes) || sanitizedAnswer === 'y' || sanitizedAnswer === 'yes') {
-        return resolve(true)
+        return resolve()
       }
 
-      return resolve(false)
+      return reject(new Error('User aborted.'))
     })
   })
 }
@@ -63,5 +61,3 @@ export function confirm(question: string, defaultYes = true) {
 function getConfirmAnswers(defaultYes = true): [string, string] {
   return [defaultYes ? 'Y' : 'y', !defaultYes ? 'N' : 'n']
 }
-
-export type Spinner = Ora

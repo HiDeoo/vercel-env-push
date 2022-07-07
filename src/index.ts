@@ -1,6 +1,7 @@
-import { parseEnvFile, validateFile } from './file'
-import { confirm, redact, type Spinner, table, text, spin } from './prompt'
-import { replaceEnvVars, validateVercelEnvs } from './vercel'
+import { type EnvVars, parseEnvFile, validateFile } from './libs/file'
+import { confirm, redact, type Spinner, table, text, spin } from './libs/prompt'
+import { pluralize } from './libs/string'
+import { replaceEnvVars, validateVercelEnvs } from './libs/vercel'
 
 export async function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
   validateVercelEnvs(envs)
@@ -8,23 +9,14 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   validateFile(envFilePath)
 
   if (options?.interactive) {
-    text(({ cyan }) => {
-      const formatter = new Intl.ListFormat('en', { style: 'short', type: 'conjunction' })
-
-      return `Preparing environment variables push from ${cyan(`'${envFilePath}'`)} to ${formatter.format(
-        envs.map((env) => cyan(env))
-      )}.`
-    })
+    logParams(envFilePath, envs)
   }
 
   const envVars = parseEnvFile(envFilePath)
+  const envVarsCount = Object.keys(envVars).length
 
   if (options?.interactive) {
-    text(({ dim }) => dim('\nThe following environment variable(s) will be pushed:'))
-    table(({ bold }) => [
-      [bold('Variable'), bold('Value')],
-      Object.entries(envVars).map(([key, value]) => [key, redact(value)]),
-    ])
+    logEnvVars(envVars, envVarsCount)
   }
 
   if (options?.dryRun) {
@@ -32,33 +24,64 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   }
 
   if (options?.interactive) {
-    const confirmed = await confirm('\nDo you want to push these environment variable(s)?')
-
-    if (!confirmed) {
-      throw new Error('User aborted.')
-    }
+    await confirm(
+      `Do you want to push ${pluralize(envVarsCount, 'this', 'these')} environment ${pluralize(
+        envVarsCount,
+        'variable'
+      )}?`
+    )
   }
 
   let spinner: Spinner | undefined
 
   if (options?.interactive) {
-    spinner = await spin('Pushing environment variables')
+    spinner = spin(`Pushing environment ${pluralize(envVarsCount, 'variable')}`)
   }
 
   try {
     await replaceEnvVars(envs, envVars)
   } catch (error) {
     if (options?.interactive && spinner) {
-      spinner.fail()
-      text(() => '\n')
+      spinner.error()
     }
 
     throw error
   }
 
   if (options?.interactive && spinner) {
-    spinner.succeed(`Pushed ${Object.keys(envVars).length} environment variable(s) to ${envs.length} environment(s).`)
+    spinner.success({
+      text: `Pushed ${envVarsCount} environment ${pluralize(envVarsCount, 'variable')} to ${envs.length} ${pluralize(
+        envs.length,
+        'environment'
+      )}.`,
+    })
   }
+}
+
+function logParams(envFilePath: string, envs: string[]) {
+  text(({ cyan, green, red, yellow }) => {
+    const formatter = new Intl.ListFormat('en', { style: 'short', type: 'conjunction' })
+
+    return `Preparing environment variables push from ${cyan(`'${envFilePath}'`)} to ${formatter.format(
+      envs.map((env) => {
+        if (env === 'development') {
+          return green(env)
+        } else if (env === 'preview') {
+          return yellow(env)
+        }
+
+        return red(env)
+      })
+    )}.`
+  })
+}
+
+function logEnvVars(envVars: EnvVars, envVarsCount: number) {
+  text(({ dim }) => dim(`The following environment ${pluralize(envVarsCount, 'variable')} will be pushed:`))
+  table(({ bold }) => [
+    [bold('Variable'), bold('Value')],
+    Object.entries(envVars).map(([key, value]) => [key, redact(value)]),
+  ])
 }
 
 interface Options {

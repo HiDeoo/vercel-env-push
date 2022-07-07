@@ -1,8 +1,10 @@
-import { afterAll, afterEach, beforeAll, describe, expect, type SpyInstance, test, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from 'vitest'
 import wyt from 'wyt'
 
 import { pushEnvVars } from '../src'
-import * as utils from '../src/utils'
+import * as process from '../src/libs/process'
+
+import { type Spy } from './libs/vitest'
 
 describe('env', () => {
   test('should throw if no environments are provided', async () => {
@@ -11,30 +13,30 @@ describe('env', () => {
 
   test('should throw if an unknown environment is provided', async () => {
     await expect(pushEnvVars('', ['test'])).rejects.toThrowErrorMatchingInlineSnapshot(
-      '"Unknown environment(s) specified."'
+      '"Unknown environment \'test\' specified."'
     )
   })
 
   test('should throw if multiple unknown environments are provided', async () => {
     await expect(pushEnvVars('', ['test', 'staging'])).rejects.toThrowErrorMatchingInlineSnapshot(
-      '"Unknown environment(s) specified."'
+      '"Unknown environment \'test\' specified."'
     )
   })
 
   test('should throw if an unknown environment is provided with known environments', async () => {
     await expect(pushEnvVars('', ['production', 'test'])).rejects.toThrowErrorMatchingInlineSnapshot(
-      '"Unknown environment(s) specified."'
+      '"Unknown environment \'test\' specified."'
     )
   })
 })
 
 describe('env var', () => {
-  let execSpy: SpyInstance<Parameters<typeof utils.exec>, ReturnType<typeof utils.exec>>
+  let execSpy: Spy<typeof process.exec>
 
   beforeAll(() => {
     vi.mock('wyt')
 
-    execSpy = vi.spyOn(utils, 'exec').mockImplementation(vi.fn<[string]>())
+    execSpy = vi.spyOn(process, 'exec').mockImplementation(vi.fn<[string]>())
   })
 
   afterAll(() => {

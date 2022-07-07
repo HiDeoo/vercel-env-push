@@ -3,7 +3,8 @@ import assert from 'node:assert'
 import wyt from 'wyt'
 
 import { type EnvVars } from './file'
-import { exec, isExecError, throwIfAnyRejected } from './utils'
+import { exec, isExecError } from './process'
+import { throwIfAnyRejected } from './promise'
 
 const vercelEnvs = ['development', 'preview', 'production'] as const
 
@@ -12,10 +13,9 @@ const rateLimiter = wyt(8, 10_000)
 export function validateVercelEnvs(envs: string[]): asserts envs is VercelEnv[] {
   assert(envs.length > 0, 'No environments specified.')
 
-  assert(
-    envs.every((env) => (vercelEnvs as ReadonlyArray<string>).includes(env)),
-    'Unknown environment(s) specified.'
-  )
+  for (const env of envs) {
+    assert((vercelEnvs as ReadonlyArray<string>).includes(env), `Unknown environment '${env}' specified.`)
+  }
 }
 
 export async function replaceEnvVars(envs: VercelEnv[], envVars: EnvVars) {

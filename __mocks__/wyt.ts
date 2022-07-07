@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 
-const rateLimiterMock = vi.fn()
-const wytMock = vi.fn(() => rateLimiterMock)
+const rateLimiter = vi.fn()
+const wyt = vi.fn(() => rateLimiter)
 
-export default wytMock
+export default wyt
