@@ -1,7 +1,7 @@
-import { execa, type ExecaChildProcess, type Options as ExecaOptions } from 'execa'
-import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, type SpyInstance, test, vi } from 'vitest'
 
 import { pushEnvVars } from '../src'
+import * as utils from '../src/utils'
 
 describe('env', () => {
   test('should throw if no environments are provided', async () => {
@@ -28,8 +28,10 @@ describe('env', () => {
 })
 
 describe('env var', () => {
+  let execSpy: SpyInstance<Parameters<typeof utils.exec>, ReturnType<typeof utils.exec>>
+
   beforeAll(() => {
-    vi.mock('execa')
+    execSpy = vi.spyOn(utils, 'exec').mockImplementation(vi.fn<[string]>())
   })
 
   afterAll(() => {
@@ -53,33 +55,27 @@ describe('env var', () => {
       keyB: 'valueB',
     }
 
-    const expectedCalls: ExecaParams[] = []
+    const expectedCommands: string[][] = []
 
     for (const [envKey, envValue] of Object.entries(envVars)) {
       for (const env of envs) {
-        expectedCalls.push(
-          ['npx', ['--yes', 'vercel', 'env', 'rm', envKey, env, '-y'], { shell: true }],
-          ['printf', [`"${envValue}"`, '|', 'npx', '--yes', 'vercel', 'env', 'add', envKey, env], { shell: true }]
+        expectedCommands.push(
+          [`npx --yes vercel env rm ${envKey} ${env} -y`],
+          [`printf "${envValue}" | npx --yes vercel env add ${envKey} ${env}`]
         )
       }
     }
 
-    const execaSpy = vi.mocked<(...params: ExecaParams) => ExecaChildProcess>(execa)
+    expect(execSpy.mock.calls.length).toBe(expectedCommands.length)
 
-    expect(execaSpy.mock.calls.length).toBe(expectedCalls.length)
-
-    for (const expectedCall of expectedCalls) {
-      expect(execaSpy.mock.calls).toContainEqual(expectedCall)
+    for (const expectedCommand of expectedCommands) {
+      expect(execSpy.mock.calls).toContainEqual(expectedCommand)
     }
   })
 
   test('should not push environment variables with the dry option', async () => {
     await pushEnvVars('test/fixtures/.env.test', ['production'], { dryRun: true })
 
-    const execaSpy = vi.mocked(execa)
-
-    expect(execaSpy).not.toHaveBeenCalled()
+    expect(execSpy).not.toHaveBeenCalled()
   })
 })
-
-type ExecaParams = [file: string, args?: string[], options?: ExecaOptions]

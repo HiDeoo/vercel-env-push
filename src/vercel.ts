@@ -1,6 +1,7 @@
 import assert from 'node:assert'
 
 import { type EnvVars } from './file'
+import { exec, isExecError, throwIfAnyRejected } from './utils'
 
 const vercelEnvs = ['development', 'preview', 'production'] as const
 
@@ -27,7 +28,7 @@ async function removeEnvVars(envs: VercelEnv[], envVars: EnvVars) {
     }
   }
 
-  return Promise.all(promises)
+  throwIfAnyRejected(await Promise.allSettled(promises))
 }
 
 async function addEnvVars(envs: VercelEnv[], envVars: EnvVars) {
@@ -39,13 +40,12 @@ async function addEnvVars(envs: VercelEnv[], envVars: EnvVars) {
     }
   }
 
-  return Promise.all(promises)
+  throwIfAnyRejected(await Promise.allSettled(promises))
 }
 
 async function addEnvVar(env: VercelEnv, key: string, value: string) {
   try {
-    // https://stackoverflow.com/a/68039150/1945960
-    await executeCommandWithNpx('printf', `"${value}"`, '|', 'npx', 'vercel', 'env', 'add', key, env)
+    await execCommandWithNpx(`printf "${value}" | npx vercel env add ${key} ${env}`)
   } catch {
     throw new Error(`Unable to add environment variable '${key}' to '${env}'.`)
   }
@@ -53,30 +53,16 @@ async function addEnvVar(env: VercelEnv, key: string, value: string) {
 
 async function removeEnvVar(env: VercelEnv, key: string) {
   try {
-    await executeCommandWithNpx('npx', 'vercel', 'env', 'rm', key, env, '-y')
-  } catch {
-    // We do not care about errors when removing an enviroment variable as they may simply not exist.
+    await execCommandWithNpx(`npx vercel env rm ${key} ${env} -y`)
+  } catch (error) {
+    if (!isExecError(error) || !error.stderr.includes('Environment Variable was not found')) {
+      throw new Error(`Unable to remove environment variable '${key}' from '${env}'.`)
+    }
   }
 }
 
-async function executeCommandWithNpx(command: string, ...args: string[]) {
-  const execaArgs: string[] = []
-
-  if (command === 'npx') {
-    execaArgs.push('--yes')
-  }
-
-  for (const arg of args) {
-    execaArgs.push(arg)
-
-    if (arg === 'npx') {
-      execaArgs.push('--yes')
-    }
-  }
-
-  const { execa } = await import('execa')
-
-  return execa(command, execaArgs, { shell: true })
+async function execCommandWithNpx(command: string) {
+  return exec(command.replace('npx', 'npx --yes'))
 }
 
 type VercelEnv = typeof vercelEnvs[number]

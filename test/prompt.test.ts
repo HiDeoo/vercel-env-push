@@ -1,23 +1,26 @@
-import { execa } from 'execa'
 import * as kolorist from 'kolorist'
 import ora from 'ora'
 import { afterAll, afterEach, beforeAll, describe, expect, type SpyInstance, test, vi } from 'vitest'
 
 import { pushEnvVars } from '../src'
 import * as prompt from '../src/prompt'
+import * as utils from '../src/utils'
 
 describe('prompt', () => {
+  let execSpy: SpyInstance<Parameters<typeof utils.exec>, ReturnType<typeof utils.exec>>
+
   let confirmSpy: SpyInstance<Parameters<typeof prompt.confirm>, ReturnType<typeof prompt.confirm>>
   let tableSpy: SpyInstance<Parameters<typeof prompt.table>, ReturnType<typeof prompt.table>>
   let textSpy: SpyInstance<Parameters<typeof prompt.text>, ReturnType<typeof prompt.text>>
 
   beforeAll(() => {
-    vi.mock('execa')
     vi.mock('ora', () => ({ default: vi.fn().mockImplementation(() => ({ start: vi.fn() })) }))
 
+    execSpy = vi.spyOn(utils, 'exec').mockImplementation(vi.fn<[string]>())
+
     confirmSpy = vi.spyOn(prompt, 'confirm')
-    tableSpy = vi.spyOn(prompt, 'table').mockImplementation(() => '')
-    textSpy = vi.spyOn(prompt, 'text').mockImplementation(() => '')
+    tableSpy = vi.spyOn(prompt, 'table').mockReturnValue()
+    textSpy = vi.spyOn(prompt, 'text').mockReturnValue()
   })
 
   afterAll(() => {
@@ -35,25 +38,21 @@ describe('prompt', () => {
   })
 
   test('should not push environment variables in interactive mode with no confirmation', async () => {
-    confirmSpy.mockReturnValueOnce(Promise.resolve(false))
+    confirmSpy.mockResolvedValue(false)
 
     await expect(
       pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
     ).rejects.toThrowErrorMatchingInlineSnapshot('"User aborted."')
 
-    const execaSpy = vi.mocked(execa)
-
-    expect(execaSpy).not.toHaveBeenCalled()
+    expect(execSpy).not.toHaveBeenCalled()
   })
 
   test('should push environment variables in interactive mode with a confirmation', async () => {
-    confirmSpy.mockReturnValueOnce(Promise.resolve(true))
+    confirmSpy.mockResolvedValue(true)
 
     await pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
 
-    const execaSpy = vi.mocked(execa)
-
-    expect(execaSpy).toHaveBeenCalledTimes(6)
+    expect(execSpy).toHaveBeenCalledTimes(6)
   })
 
   test('should not log anything in non-interactive mode', async () => {
@@ -63,7 +62,7 @@ describe('prompt', () => {
   })
 
   test('should log the environment file path and push environments in interactive mode', async () => {
-    confirmSpy.mockReturnValueOnce(Promise.resolve(true))
+    confirmSpy.mockResolvedValue(true)
 
     await pushEnvVars('test/fixtures/.env.test', ['development', 'preview', 'production'], { interactive: true })
 
@@ -73,7 +72,7 @@ describe('prompt', () => {
   })
 
   test('should log redacted environment variables in interactive mode', async () => {
-    confirmSpy.mockReturnValueOnce(Promise.resolve(true))
+    confirmSpy.mockResolvedValue(true)
 
     await pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
 
@@ -116,7 +115,7 @@ describe('prompt', () => {
   })
 
   test('should show a spinner in interactive mode', async () => {
-    confirmSpy.mockReturnValueOnce(Promise.resolve(true))
+    confirmSpy.mockResolvedValue(true)
 
     await pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
 
