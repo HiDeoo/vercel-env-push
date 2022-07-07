@@ -13,19 +13,19 @@ describe('env', () => {
 
   test('should throw if an unknown environment is provided', async () => {
     await expect(pushEnvVars('', ['test'])).rejects.toThrowErrorMatchingInlineSnapshot(
-      '"Unknown environment(s) specified."'
+      '"Unknown environment \'test\' specified."'
     )
   })
 
   test('should throw if multiple unknown environments are provided', async () => {
     await expect(pushEnvVars('', ['test', 'staging'])).rejects.toThrowErrorMatchingInlineSnapshot(
-      '"Unknown environment(s) specified."'
+      '"Unknown environment \'test\' specified."'
     )
   })
 
   test('should throw if an unknown environment is provided with known environments', async () => {
     await expect(pushEnvVars('', ['production', 'test'])).rejects.toThrowErrorMatchingInlineSnapshot(
-      '"Unknown environment(s) specified."'
+      '"Unknown environment \'test\' specified."'
     )
   })
 })

@@ -1,5 +1,6 @@
 import { type EnvVars, parseEnvFile, validateFile } from './libs/file'
 import { confirm, redact, type Spinner, table, text, spin } from './libs/prompt'
+import { pluralize } from './libs/string'
 import { replaceEnvVars, validateVercelEnvs } from './libs/vercel'
 
 export async function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
@@ -12,9 +13,10 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   }
 
   const envVars = parseEnvFile(envFilePath)
+  const envVarsCount = Object.keys(envVars).length
 
   if (options?.interactive) {
-    logEnvVars(envVars)
+    logEnvVars(envVars, envVarsCount)
   }
 
   if (options?.dryRun) {
@@ -22,13 +24,18 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   }
 
   if (options?.interactive) {
-    await confirm('Do you want to push these environment variable(s)?')
+    await confirm(
+      `Do you want to push ${pluralize(envVarsCount, 'this', 'these')} environment ${pluralize(
+        envVarsCount,
+        'variable'
+      )}?`
+    )
   }
 
   let spinner: Spinner | undefined
 
   if (options?.interactive) {
-    spinner = spin('Pushing environment variables')
+    spinner = spin(`Pushing environment ${pluralize(envVarsCount, 'variable')}`)
   }
 
   try {
@@ -43,7 +50,10 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
 
   if (options?.interactive && spinner) {
     spinner.success({
-      text: `Pushed ${Object.keys(envVars).length} environment variable(s) to ${envs.length} environment(s).`,
+      text: `Pushed ${envVarsCount} environment ${pluralize(envVarsCount, 'variable')} to ${envs.length} ${pluralize(
+        envs.length,
+        'environment'
+      )}.`,
     })
   }
 }
@@ -66,8 +76,8 @@ function logParams(envFilePath: string, envs: string[]) {
   })
 }
 
-function logEnvVars(envVars: EnvVars) {
-  text(({ dim }) => dim('The following environment variable(s) will be pushed:'))
+function logEnvVars(envVars: EnvVars, envVarsCount: number) {
+  text(({ dim }) => dim(`The following environment ${pluralize(envVarsCount, 'variable')} will be pushed:`))
   table(({ bold }) => [
     [bold('Variable'), bold('Value')],
     Object.entries(envVars).map(([key, value]) => [key, redact(value)]),

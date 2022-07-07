@@ -81,7 +81,7 @@ describe('prompt', () => {
     await pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
 
     expect(textSpy.mock.calls[1]?.[0](kolorist)).toMatchInlineSnapshot(
-      '"The following environment variable(s) will be pushed:"'
+      '"The following environment variables will be pushed:"'
     )
 
     expect(tableSpy).toHaveBeenCalledOnce()
