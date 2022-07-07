@@ -110,9 +110,9 @@ describe('prompt', () => {
   test('should not show a spinner in non-interactive mode', async () => {
     await pushEnvVars('test/fixtures/.env.test', ['production'])
 
-    const spinSpy = vi.mocked(ora)
+    const spinMock = vi.mocked(ora)
 
-    expect(spinSpy).not.toHaveBeenCalled()
+    expect(spinMock).not.toHaveBeenCalled()
   })
 
   test('should show a spinner in interactive mode', async () => {
@@ -120,9 +120,9 @@ describe('prompt', () => {
 
     await pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
 
-    const spinSpy = vi.mocked(ora)
+    const spinMock = vi.mocked(ora)
 
-    expect(spinSpy).toHaveBeenCalledOnce()
+    expect(spinMock).toHaveBeenCalledOnce()
   })
 })
 

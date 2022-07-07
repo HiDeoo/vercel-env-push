@@ -42,7 +42,10 @@ describe('env var', () => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
+    execSpy.mockClear()
+
+    const rateLimiterMock = vi.mocked(vi.mocked(wyt).mock.results[0]?.value)
+    rateLimiterMock.mockClear()
   })
 
   test.each([
@@ -126,12 +129,11 @@ describe('env var', () => {
     expect(execSpy).toHaveBeenCalledTimes(6)
   })
 
-  test.only('should rate limit requests', async () => {
+  test('should rate limit requests', async () => {
     await pushEnvVars('test/fixtures/.env.test', ['production'])
 
-    const wytSpy = vi.mocked(wyt)
-    const rateLimiterSpy = vi.mocked(wytSpy.mock.results[0]?.value)
+    const rateLimiterMock = vi.mocked(vi.mocked(wyt).mock.results[0]?.value)
 
-    expect(rateLimiterSpy).toHaveBeenCalledTimes(6)
+    expect(rateLimiterMock).toHaveBeenCalledTimes(6)
   })
 })
