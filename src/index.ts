@@ -12,8 +12,12 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
     logParams(envFilePath, envs)
   }
 
-  const envVars = parseEnvFile(envFilePath)
+  let envVars = parseEnvFile(envFilePath)
   const envVarsCount = Object.keys(envVars).length
+
+  if (options?.prePush) {
+    envVars = await options.prePush(envVars)
+  }
 
   if (options?.interactive) {
     logEnvVars(envVars, envVarsCount)
@@ -87,4 +91,5 @@ function logEnvVars(envVars: EnvVars, envVarsCount: number) {
 interface Options {
   dryRun?: boolean
   interactive?: boolean
+  prePush?: (envVars: EnvVars) => EnvVars | Promise<EnvVars>
 }
