@@ -1,8 +1,10 @@
-import { afterAll, afterEach, beforeAll, describe, expect, type SpyInstance, test, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from 'vitest'
 import wyt from 'wyt'
 
 import { pushEnvVars } from '../src'
 import * as utils from '../src/utils'
+
+import { type Spy } from './utils/vitest'
 
 describe('env', () => {
   test('should throw if no environments are provided', async () => {
@@ -29,7 +31,7 @@ describe('env', () => {
 })
 
 describe('env var', () => {
-  let execSpy: SpyInstance<Parameters<typeof utils.exec>, ReturnType<typeof utils.exec>>
+  let execSpy: Spy<typeof utils.exec>
 
   beforeAll(() => {
     vi.mock('wyt')

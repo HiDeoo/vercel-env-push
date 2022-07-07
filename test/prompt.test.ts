@@ -1,18 +1,20 @@
 import * as kolorist from 'kolorist'
 import { createSpinner } from 'nanospinner'
-import { afterAll, afterEach, beforeAll, describe, expect, type SpyInstance, test, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from 'vitest'
 
 import { pushEnvVars } from '../src'
 import * as prompt from '../src/prompt'
 import * as utils from '../src/utils'
 
-describe('prompt', () => {
-  let execSpy: SpyInstance<Parameters<typeof utils.exec>, ReturnType<typeof utils.exec>>
+import { type Spy } from './utils/vitest'
 
-  let confirmSpy: SpyInstance<Parameters<typeof prompt.confirm>, ReturnType<typeof prompt.confirm>>
-  let spinSpy: SpyInstance<Parameters<typeof prompt.spin>, ReturnType<typeof prompt.spin>>
-  let tableSpy: SpyInstance<Parameters<typeof prompt.table>, ReturnType<typeof prompt.table>>
-  let textSpy: SpyInstance<Parameters<typeof prompt.text>, ReturnType<typeof prompt.text>>
+describe('prompt', () => {
+  let execSpy: Spy<typeof utils.exec>
+
+  let confirmSpy: Spy<typeof prompt.confirm>
+  let spinSpy: Spy<typeof prompt.spin>
+  let tableSpy: Spy<typeof prompt.table>
+  let textSpy: Spy<typeof prompt.text>
 
   beforeAll(() => {
     vi.mock('nanospinner')
@@ -20,6 +22,7 @@ describe('prompt', () => {
 
     execSpy = vi.spyOn(utils, 'exec').mockImplementation(vi.fn<[string]>())
 
+    confirmSpy = vi.spyOn(prompt, 'confirm')
     confirmSpy = vi.spyOn(prompt, 'confirm')
     spinSpy = vi.spyOn(prompt, 'spin')
     tableSpy = vi.spyOn(prompt, 'table').mockReturnValue()
