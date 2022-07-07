@@ -46,8 +46,10 @@ async function addEnvVars(envs: VercelEnv[], envVars: EnvVars) {
 async function addEnvVar(env: VercelEnv, key: string, value: string) {
   try {
     await execCommandWithNpx(`printf "${value}" | npx vercel env add ${key} ${env}`)
-  } catch {
-    throw new Error(`Unable to add environment variable '${key}' to '${env}'.`)
+  } catch (error) {
+    throw new Error(`Unable to add environment variable '${key}' to '${env}'.`, {
+      cause: error instanceof Error ? error : undefined,
+    })
   }
 }
 
@@ -56,7 +58,9 @@ async function removeEnvVar(env: VercelEnv, key: string) {
     await execCommandWithNpx(`npx vercel env rm ${key} ${env} -y`)
   } catch (error) {
     if (!isExecError(error) || !error.stderr.includes('Environment Variable was not found')) {
-      throw new Error(`Unable to remove environment variable '${key}' from '${env}'.`)
+      throw new Error(`Unable to remove environment variable '${key}' from '${env}'.`, {
+        cause: error instanceof Error ? error : undefined,
+      })
     }
   }
 }
