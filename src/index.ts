@@ -1,4 +1,4 @@
-import { parseEnvFile, validateFile } from './libs/file'
+import { type EnvVars, parseEnvFile, validateFile } from './libs/file'
 import { confirm, redact, type Spinner, table, text, spin } from './libs/prompt'
 import { replaceEnvVars, validateVercelEnvs } from './libs/vercel'
 
@@ -8,31 +8,13 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   validateFile(envFilePath)
 
   if (options?.interactive) {
-    text(({ cyan, green, red, yellow }) => {
-      const formatter = new Intl.ListFormat('en', { style: 'short', type: 'conjunction' })
-
-      return `Preparing environment variables push from ${cyan(`'${envFilePath}'`)} to ${formatter.format(
-        envs.map((env) => {
-          if (env === 'development') {
-            return green(env)
-          } else if (env === 'preview') {
-            return yellow(env)
-          }
-
-          return red(env)
-        })
-      )}.`
-    })
+    logParams(envFilePath, envs)
   }
 
   const envVars = parseEnvFile(envFilePath)
 
   if (options?.interactive) {
-    text(({ dim }) => dim('The following environment variable(s) will be pushed:'))
-    table(({ bold }) => [
-      [bold('Variable'), bold('Value')],
-      Object.entries(envVars).map(([key, value]) => [key, redact(value)]),
-    ])
+    logEnvVars(envVars)
   }
 
   if (options?.dryRun) {
@@ -40,11 +22,7 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   }
 
   if (options?.interactive) {
-    const confirmed = await confirm('Do you want to push these environment variable(s)?')
-
-    if (!confirmed) {
-      throw new Error('User aborted.')
-    }
+    await confirm('Do you want to push these environment variable(s)?')
   }
 
   let spinner: Spinner | undefined
@@ -68,6 +46,32 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
       text: `Pushed ${Object.keys(envVars).length} environment variable(s) to ${envs.length} environment(s).`,
     })
   }
+}
+
+function logParams(envFilePath: string, envs: string[]) {
+  text(({ cyan, green, red, yellow }) => {
+    const formatter = new Intl.ListFormat('en', { style: 'short', type: 'conjunction' })
+
+    return `Preparing environment variables push from ${cyan(`'${envFilePath}'`)} to ${formatter.format(
+      envs.map((env) => {
+        if (env === 'development') {
+          return green(env)
+        } else if (env === 'preview') {
+          return yellow(env)
+        }
+
+        return red(env)
+      })
+    )}.`
+  })
+}
+
+function logEnvVars(envVars: EnvVars) {
+  text(({ dim }) => dim('The following environment variable(s) will be pushed:'))
+  table(({ bold }) => [
+    [bold('Variable'), bold('Value')],
+    Object.entries(envVars).map(([key, value]) => [key, redact(value)]),
+  ])
 }
 
 interface Options {

@@ -44,17 +44,15 @@ describe('prompt', () => {
   })
 
   test('should not push environment variables in interactive mode with no confirmation', async () => {
-    confirmSpy.mockResolvedValue(false)
+    confirmSpy.mockRejectedValue(new Error('test'))
 
-    await expect(
-      pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
-    ).rejects.toThrowErrorMatchingInlineSnapshot('"User aborted."')
+    await expect(pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })).rejects.toThrowError()
 
     expect(execSpy).not.toHaveBeenCalled()
   })
 
   test('should push environment variables in interactive mode with a confirmation', async () => {
-    confirmSpy.mockResolvedValue(true)
+    confirmSpy.mockResolvedValue()
 
     await pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
 
@@ -68,7 +66,7 @@ describe('prompt', () => {
   })
 
   test('should log the environment file path and push environments in interactive mode', async () => {
-    confirmSpy.mockResolvedValue(true)
+    confirmSpy.mockResolvedValue()
 
     await pushEnvVars('test/fixtures/.env.test', ['development', 'preview', 'production'], { interactive: true })
 
@@ -78,7 +76,7 @@ describe('prompt', () => {
   })
 
   test('should log redacted environment variables in interactive mode', async () => {
-    confirmSpy.mockResolvedValue(true)
+    confirmSpy.mockResolvedValue()
 
     await pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
 
@@ -118,7 +116,7 @@ describe('prompt', () => {
   })
 
   test('should show a spinner in interactive mode', async () => {
-    confirmSpy.mockResolvedValue(true)
+    confirmSpy.mockResolvedValue()
 
     await pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })
 
@@ -133,7 +131,7 @@ describe('prompt', () => {
   test('should show an error symbol instead of a spinner when encountering an error in interactive mode', async () => {
     execSpy.mockRejectedValueOnce(new Error('test'))
 
-    confirmSpy.mockResolvedValue(true)
+    confirmSpy.mockResolvedValue()
 
     await expect(pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true })).rejects.toThrow()
 
