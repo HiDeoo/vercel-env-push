@@ -78,4 +78,48 @@ describe('env var', () => {
 
     expect(execSpy).not.toHaveBeenCalled()
   })
+
+  test('should not try to add environment variables if removing them failed for an unknown reason', async () => {
+    execSpy.mockResolvedValueOnce({ stderr: '', stdout: '' }).mockRejectedValueOnce(new Error('test'))
+
+    await expect(pushEnvVars('test/fixtures/.env.test', ['production'])).rejects.toThrowErrorMatchingInlineSnapshot(
+      "\"Unable to remove environment variable 'keyAExpanded' from 'production'.\""
+    )
+
+    expect(execSpy).toHaveBeenCalledTimes(3)
+  })
+
+  test('should ignore errors related to deleting an unknown environment variables', async () => {
+    class ExecError extends Error {
+      constructor(public stderr: string) {
+        super()
+      }
+    }
+
+    const error = new ExecError('test')
+    error.stderr = 'Environment Variable was not found'
+
+    execSpy.mockResolvedValueOnce({ stderr: '', stdout: '' }).mockRejectedValueOnce(error)
+
+    await pushEnvVars('test/fixtures/.env.test', ['production'])
+
+    expect(execSpy).toHaveBeenCalledTimes(6)
+  })
+
+  test('should throw the first encountered error during a push', async () => {
+    const execResponse = { stderr: '', stdout: '' }
+
+    execSpy
+      .mockResolvedValueOnce(execResponse)
+      .mockResolvedValueOnce(execResponse)
+      .mockResolvedValueOnce(execResponse)
+      .mockResolvedValueOnce(execResponse)
+      .mockRejectedValueOnce(new Error('test'))
+
+    await expect(pushEnvVars('test/fixtures/.env.test', ['production'])).rejects.toThrowErrorMatchingInlineSnapshot(
+      "\"Unable to add environment variable 'keyAExpanded' to 'production'.\""
+    )
+
+    expect(execSpy).toHaveBeenCalledTimes(6)
+  })
 })
