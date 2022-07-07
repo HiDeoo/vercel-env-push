@@ -2,9 +2,16 @@ import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from 'vite
 import wyt from 'wyt'
 
 import { pushEnvVars } from '../src'
+import { type EnvVars } from '../src/libs/file'
 import * as process from '../src/libs/process'
 
 import { type Spy } from './libs/vitest'
+
+const defaultExpectedEnvVars = {
+  keyA: 'valueA',
+  keyAExpanded: 'valueA',
+  keyB: 'valueB',
+}
 
 describe('env', () => {
   test('should throw if no environments are provided', async () => {
@@ -57,22 +64,7 @@ describe('env var', () => {
   ])('should push environment variables to %i environment(s)', async (_count, envs) => {
     await pushEnvVars('test/fixtures/.env.test', envs)
 
-    const envVars = {
-      keyA: 'valueA',
-      keyAExpanded: 'valueA',
-      keyB: 'valueB',
-    }
-
-    const expectedCommands: string[][] = []
-
-    for (const [envKey, envValue] of Object.entries(envVars)) {
-      for (const env of envs) {
-        expectedCommands.push(
-          [`npx --yes vercel env rm ${envKey} ${env} -y`],
-          [`printf "${envValue}" | npx --yes vercel env add ${envKey} ${env}`]
-        )
-      }
-    }
+    const expectedCommands = getExpectedCommands(envs, defaultExpectedEnvVars)
 
     expect(execSpy.mock.calls.length).toBe(expectedCommands.length)
 
@@ -138,4 +130,137 @@ describe('env var', () => {
 
     expect(rateLimiterMock).toHaveBeenCalledTimes(6)
   })
+
+  describe('prePush', () => {
+    test('should modify environment variable names and values', async () => {
+      const envs = ['development', 'production']
+
+      await pushEnvVars('test/fixtures/.env.test', envs, {
+        prePush: (envVars) => {
+          const newEnvVars: EnvVars = {}
+
+          for (const [key, value] of Object.entries(envVars)) {
+            newEnvVars[`modified_${key}`] = `modified_${value}`
+          }
+
+          return newEnvVars
+        },
+      })
+
+      const expectedCommands = getExpectedCommands(envs, {
+        modified_keyA: 'modified_valueA',
+        modified_keyAExpanded: 'modified_valueA',
+        modified_keyB: 'modified_valueB',
+      })
+
+      expect(execSpy.mock.calls.length).toBe(expectedCommands.length)
+
+      for (const expectedCommand of expectedCommands) {
+        expect(execSpy.mock.calls).toContainEqual(expectedCommand)
+      }
+    })
+
+    test('should add environment variables', async () => {
+      const envs = ['development', 'production']
+
+      await pushEnvVars('test/fixtures/.env.test', envs, {
+        prePush: (envVars) => {
+          return { ...envVars, newKey: 'newValue' }
+        },
+      })
+
+      const expectedCommands = getExpectedCommands(envs, {
+        ...defaultExpectedEnvVars,
+        newKey: 'newValue',
+      })
+
+      expect(execSpy.mock.calls.length).toBe(expectedCommands.length)
+
+      for (const expectedCommand of expectedCommands) {
+        expect(execSpy.mock.calls).toContainEqual(expectedCommand)
+      }
+    })
+
+    test('should remove environment variables', async () => {
+      const envs = ['development', 'production']
+
+      await pushEnvVars('test/fixtures/.env.test', envs, {
+        prePush: ({ keyA, keyB, ...otherEnvVars }) => {
+          return otherEnvVars
+        },
+      })
+
+      const expectedCommands = getExpectedCommands(envs, {
+        keyAExpanded: 'valueA',
+      })
+
+      expect(execSpy.mock.calls.length).toBe(expectedCommands.length)
+
+      for (const expectedCommand of expectedCommands) {
+        expect(execSpy.mock.calls).toContainEqual(expectedCommand)
+      }
+    })
+
+    test('should accept an asynchronous prePush transformer', async () => {
+      const envs = ['development', 'production']
+
+      await pushEnvVars('test/fixtures/.env.test', envs, {
+        prePush: async (envVars) => {
+          const secretValue = await getAsyncSecretValue()
+
+          return { ...envVars, secretValue }
+        },
+      })
+
+      const expectedCommands = getExpectedCommands(envs, {
+        ...defaultExpectedEnvVars,
+        secretValue: 'secretValue',
+      })
+
+      expect(execSpy.mock.calls.length).toBe(expectedCommands.length)
+
+      for (const expectedCommand of expectedCommands) {
+        expect(execSpy.mock.calls).toContainEqual(expectedCommand)
+      }
+    })
+
+    test('should handle a prePush transformer throwing an exception', async () => {
+      const envs = ['development', 'production']
+
+      await expect(
+        pushEnvVars('test/fixtures/.env.test', envs, {
+          prePush: (envVars) => {
+            if (Object.keys(envVars).length === Object.keys(defaultExpectedEnvVars).length) {
+              throw new Error('prePush Error')
+            }
+
+            return envVars
+          },
+        })
+      ).rejects.toThrowErrorMatchingInlineSnapshot('"prePush Error"')
+    })
+  })
 })
+
+function getExpectedCommands(envs: string[], envVars: EnvVars) {
+  const expectedCommands: string[][] = []
+
+  for (const [envKey, envValue] of Object.entries(envVars)) {
+    for (const env of envs) {
+      expectedCommands.push(
+        [`npx --yes vercel env rm ${envKey} ${env} -y`],
+        [`printf "${envValue}" | npx --yes vercel env add ${envKey} ${env}`]
+      )
+    }
+  }
+
+  return expectedCommands
+}
+
+function getAsyncSecretValue() {
+  return new Promise<string>((resolve) => {
+    setTimeout(() => {
+      resolve(`secretValue`)
+    }, 10)
+  })
+}
