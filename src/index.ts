@@ -1,6 +1,6 @@
-import { parseEnvFile, validateFile } from './file'
-import { confirm, redact, type Spinner, table, text, spin } from './prompt'
-import { replaceEnvVars, validateVercelEnvs } from './vercel'
+import { parseEnvFile, validateFile } from './libs/file'
+import { confirm, redact, type Spinner, table, text, spin } from './libs/prompt'
+import { replaceEnvVars, validateVercelEnvs } from './libs/vercel'
 
 export async function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
   validateVercelEnvs(envs)

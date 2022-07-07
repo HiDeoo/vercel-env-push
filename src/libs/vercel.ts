@@ -3,7 +3,8 @@ import assert from 'node:assert'
 import wyt from 'wyt'
 
 import { type EnvVars } from './file'
-import { exec, isExecError, throwIfAnyRejected } from './utils'
+import { exec, isExecError } from './process'
+import { throwIfAnyRejected } from './promise'
 
 const vercelEnvs = ['development', 'preview', 'production'] as const
 

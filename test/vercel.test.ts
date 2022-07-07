@@ -2,9 +2,9 @@ import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from 'vite
 import wyt from 'wyt'
 
 import { pushEnvVars } from '../src'
-import * as utils from '../src/utils'
+import * as process from '../src/libs/process'
 
-import { type Spy } from './utils/vitest'
+import { type Spy } from './libs/vitest'
 
 describe('env', () => {
   test('should throw if no environments are provided', async () => {
@@ -31,12 +31,12 @@ describe('env', () => {
 })
 
 describe('env var', () => {
-  let execSpy: Spy<typeof utils.exec>
+  let execSpy: Spy<typeof process.exec>
 
   beforeAll(() => {
     vi.mock('wyt')
 
-    execSpy = vi.spyOn(utils, 'exec').mockImplementation(vi.fn<[string]>())
+    execSpy = vi.spyOn(process, 'exec').mockImplementation(vi.fn<[string]>())
   })
 
   afterAll(() => {

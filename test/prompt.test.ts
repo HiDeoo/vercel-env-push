@@ -3,13 +3,13 @@ import { createSpinner } from 'nanospinner'
 import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from 'vitest'
 
 import { pushEnvVars } from '../src'
-import * as prompt from '../src/prompt'
-import * as utils from '../src/utils'
+import * as process from '../src/libs/process'
+import * as prompt from '../src/libs/prompt'
 
-import { type Spy } from './utils/vitest'
+import { type Spy } from './libs/vitest'
 
 describe('prompt', () => {
-  let execSpy: Spy<typeof utils.exec>
+  let execSpy: Spy<typeof process.exec>
 
   let confirmSpy: Spy<typeof prompt.confirm>
   let spinSpy: Spy<typeof prompt.spin>
@@ -20,7 +20,7 @@ describe('prompt', () => {
     vi.mock('nanospinner')
     vi.mock('wyt')
 
-    execSpy = vi.spyOn(utils, 'exec').mockImplementation(vi.fn<[string]>())
+    execSpy = vi.spyOn(process, 'exec').mockImplementation(vi.fn<[string]>())
 
     confirmSpy = vi.spyOn(prompt, 'confirm')
     confirmSpy = vi.spyOn(prompt, 'confirm')
