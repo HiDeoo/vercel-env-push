@@ -4,8 +4,8 @@ import { pushEnvVars } from '../src'
 
 describe('file', () => {
   test('should throw if the provided file does not exist', async () => {
-    await expect(pushEnvVars('./fixtures/unknown', ['production'])).rejects.toThrowErrorMatchingInlineSnapshot(
-      '"No file found at \'./fixtures/unknown\'."'
+    await expect(pushEnvVars('test/fixtures/.env.unknown', ['production'])).rejects.toThrowErrorMatchingInlineSnapshot(
+      '"No file found at \'test/fixtures/.env.unknown\'."'
     )
   })
 })
