@@ -65,7 +65,7 @@ async function removeEnvVar(env: VercelEnv, key: string) {
 
     await execCommandWithNpx(`npx vercel env rm ${key} ${env} -y`)
   } catch (error) {
-    if (!isExecError(error) || !error.stderr.includes('Environment Variable was not found')) {
+    if (!isExecError(error) || !error.stderr.includes('was not found')) {
       throw new Error(`Unable to remove environment variable '${key}' from '${env}'.`, {
         cause: error instanceof Error ? error : undefined,
       })

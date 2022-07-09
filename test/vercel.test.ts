@@ -97,7 +97,7 @@ describe('env var', () => {
     }
 
     const error = new ExecError('test')
-    error.stderr = 'Environment Variable was not found'
+    error.stderr = 'was not found'
 
     execSpy.mockResolvedValueOnce({ stderr: '', stdout: '' }).mockRejectedValueOnce(error)
 
