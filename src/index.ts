@@ -43,7 +43,7 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   }
 
   try {
-    await replaceEnvVars(envs, envVars)
+    await replaceEnvVars(envs, envVars, options?.token)
   } catch (error) {
     if (options?.interactive && spinner) {
       spinner.error()
@@ -92,4 +92,5 @@ interface Options {
   dryRun?: boolean
   interactive?: boolean
   prePush?: (envVars: EnvVars) => EnvVars | Promise<EnvVars>
+  token?: string
 }

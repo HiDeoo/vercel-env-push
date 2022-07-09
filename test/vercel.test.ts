@@ -242,10 +242,28 @@ describe('env var', () => {
       ).rejects.toThrowErrorMatchingInlineSnapshot('"prePush Error"')
     })
   })
+
+  describe('token', () => {
+    test('should forward a token to the vercel CLI', async () => {
+      const envs = ['production']
+      const token = 'testToken'
+
+      await pushEnvVars('test/fixtures/.env.test', ['production'], { token })
+
+      let expectedCommands = getExpectedCommands(envs, defaultExpectedEnvVars)
+      expectedCommands = expectedCommands.map((expectedCommand) => [`${expectedCommand} -t ${token}`])
+
+      expect(execSpy.mock.calls.length).toBe(expectedCommands.length)
+
+      for (const expectedCommand of expectedCommands) {
+        expect(execSpy.mock.calls).toContainEqual(expectedCommand)
+      }
+    })
+  })
 })
 
-function getExpectedCommands(envs: string[], envVars: EnvVars) {
-  const expectedCommands: string[][] = []
+function getExpectedCommands(envs: string[], envVars: EnvVars): [string][] {
+  const expectedCommands: [string][] = []
 
   for (const [envKey, envValue] of Object.entries(envVars)) {
     for (const env of envs) {

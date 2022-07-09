@@ -16,6 +16,7 @@ cli.version(version).help((sections) => {
 cli
   .command('<file> <env> [...otherEnvs]')
   .option('--dry, --dry-run', 'List environment variables without pushing them')
+  .option('-t, --token <token>', 'Login token to use for pushing environment variables')
   .action(async (file: string, env: string, otherEnvs: string[], options: CliOptions) => {
     await pushEnvVars(file, [env, ...otherEnvs], { ...options, interactive: true })
   })
