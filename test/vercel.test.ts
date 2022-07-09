@@ -73,12 +73,6 @@ describe('env var', () => {
     }
   })
 
-  test('should not push environment variables with the dry option', async () => {
-    await pushEnvVars('test/fixtures/.env.test', ['production'], { dryRun: true })
-
-    expect(execSpy).not.toHaveBeenCalled()
-  })
-
   test('should not try to add environment variables if removing them failed for an unknown reason', async () => {
     execSpy.mockResolvedValueOnce({ stderr: '', stdout: '' }).mockRejectedValueOnce(new Error('test'))
 
@@ -129,6 +123,14 @@ describe('env var', () => {
     const rateLimiterMock = vi.mocked(vi.mocked(wyt).mock.results[0]?.value)
 
     expect(rateLimiterMock).toHaveBeenCalledTimes(6)
+  })
+
+  describe('dryRun', () => {
+    test('should not push environment variables with the dry option', async () => {
+      await pushEnvVars('test/fixtures/.env.test', ['production'], { dryRun: true })
+
+      expect(execSpy).not.toHaveBeenCalled()
+    })
   })
 
   describe('prePush', () => {
