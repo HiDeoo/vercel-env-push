@@ -73,12 +73,6 @@ describe('env var', () => {
     }
   })
 
-  test('should not push environment variables with the dry option', async () => {
-    await pushEnvVars('test/fixtures/.env.test', ['production'], { dryRun: true })
-
-    expect(execSpy).not.toHaveBeenCalled()
-  })
-
   test('should not try to add environment variables if removing them failed for an unknown reason', async () => {
     execSpy.mockResolvedValueOnce({ stderr: '', stdout: '' }).mockRejectedValueOnce(new Error('test'))
 
@@ -97,7 +91,7 @@ describe('env var', () => {
     }
 
     const error = new ExecError('test')
-    error.stderr = 'Environment Variable was not found'
+    error.stderr = 'was not found'
 
     execSpy.mockResolvedValueOnce({ stderr: '', stdout: '' }).mockRejectedValueOnce(error)
 
@@ -129,6 +123,14 @@ describe('env var', () => {
     const rateLimiterMock = vi.mocked(vi.mocked(wyt).mock.results[0]?.value)
 
     expect(rateLimiterMock).toHaveBeenCalledTimes(6)
+  })
+
+  describe('dryRun', () => {
+    test('should not push environment variables with the dry option', async () => {
+      await pushEnvVars('test/fixtures/.env.test', ['production'], { dryRun: true })
+
+      expect(execSpy).not.toHaveBeenCalled()
+    })
   })
 
   describe('prePush', () => {
@@ -240,10 +242,28 @@ describe('env var', () => {
       ).rejects.toThrowErrorMatchingInlineSnapshot('"prePush Error"')
     })
   })
+
+  describe('token', () => {
+    test('should forward a token to the vercel CLI', async () => {
+      const envs = ['production']
+      const token = 'testToken'
+
+      await pushEnvVars('test/fixtures/.env.test', ['production'], { token })
+
+      let expectedCommands = getExpectedCommands(envs, defaultExpectedEnvVars)
+      expectedCommands = expectedCommands.map((expectedCommand) => [`${expectedCommand} -t ${token}`])
+
+      expect(execSpy.mock.calls.length).toBe(expectedCommands.length)
+
+      for (const expectedCommand of expectedCommands) {
+        expect(execSpy.mock.calls).toContainEqual(expectedCommand)
+      }
+    })
+  })
 })
 
-function getExpectedCommands(envs: string[], envVars: EnvVars) {
-  const expectedCommands: string[][] = []
+function getExpectedCommands(envs: string[], envVars: EnvVars): [string][] {
+  const expectedCommands: [string][] = []
 
   for (const [envKey, envValue] of Object.entries(envVars)) {
     for (const env of envs) {
