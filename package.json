@@ -22,7 +22,8 @@
     "build": "unbuild",
     "test": "vitest",
     "lint": "prettier -c . && eslint . --max-warnings=0 && tsc --noEmit",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "cac": "6.7.12",
