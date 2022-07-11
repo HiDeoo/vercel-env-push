@@ -2,8 +2,8 @@
   <h1>vercel-env-push 🔏</h1>
   <p>The missing <code>vercel env push</code> command</p>
   <p>
-    <a href="https://user-images.githubusercontent.com/494699/178266496-c971c950-15ed-4427-9178-4fd6f24a86e7.png" title="Screenshot of vercel-env-push">
-      <img alt="Screenshot of vercel-env-push" src="https://user-images.githubusercontent.com/494699/178266496-c971c950-15ed-4427-9178-4fd6f24a86e7.png" width="520" />
+    <a href="https://user-images.githubusercontent.com/494699/178267610-2843f230-f048-43d4-88b5-baba6ee00e4d.png" title="Screenshot of vercel-env-push">
+      <img alt="Screenshot of vercel-env-push" src="https://user-images.githubusercontent.com/494699/178267610-2843f230-f048-43d4-88b5-baba6ee00e4d.png" width="520" />
     </a>
   </p>
 </div>
