@@ -1,6 +1,10 @@
 {
   "name": "vercel-env-push",
+  "description": "The missing Vercel CLI command to push environment variables from .env files.",
+  "homepage": "https://github.com/HiDeoo/vercel-env-push",
   "version": "0.1.0",
+  "author": "HiDeoo",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
@@ -44,6 +48,21 @@
   "packageManager": "pnpm@7.4.0",
   "engines": {
     "node": ">=14.0.0"
+  },
+  "keywords": [
+    "cli",
+    "environment-variables",
+    "env",
+    "push",
+    "vercel",
+    "env-file"
+  ],
+  "bugs": {
+    "url": "https://github.com/HiDeoo/vercel-env-push/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HiDeoo/vercel-env-push"
   },
   "prettier": "@hideoo/prettier-config",
   "lint-staged": {
