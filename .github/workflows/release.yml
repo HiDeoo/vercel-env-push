@@ -1,20 +1,14 @@
-name: integration
+name: release
 
 on:
   push:
-    branches:
-      - '**'
-    tags-ignore:
-      - '**'
-  pull_request:
+    tags:
+      - 'v*.*.*'
 
 jobs:
-  lint_test:
-    name: Lint & Test
+  publish:
+    name: Release
     runs-on: ubuntu-latest
-    # Run on external PRs only as the workflow will be already running for the push event on the branch for internal
-    # PRs.
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -46,10 +40,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Lint
-        run: pnpm lint
-
-      - name: Test
-        run: pnpm test
+      - name: Publish
+        run: pnpm publish
         env:
-          NODE_DISABLE_COLORS: 1
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+
+      - name: Draft new Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
