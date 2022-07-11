@@ -1,6 +1,11 @@
 <div align="center">
   <h1>vercel-env-push 🔏</h1>
   <p>The missing <code>vercel env push</code> command</p>
+  <p>
+    <a href="https://user-images.githubusercontent.com/494699/178266496-c971c950-15ed-4427-9178-4fd6f24a86e7.png" title="Screenshot of vercel-env-push">
+      <img alt="Screenshot of vercel-env-push" src="https://user-images.githubusercontent.com/494699/178266496-c971c950-15ed-4427-9178-4fd6f24a86e7.png" width="520" />
+    </a>
+  </p>
 </div>
 
 <div align="center">
