@@ -45,7 +45,12 @@
     "unbuild": "0.7.4",
     "vitest": "0.17.0"
   },
+  "files": [
+    "cli.mjs",
+    "dist"
+  ],
   "packageManager": "pnpm@7.4.0",
+  "sideEffects": false,
   "engines": {
     "node": ">=14.0.0"
   },
