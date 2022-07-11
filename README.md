@@ -62,32 +62,23 @@ $ pnpm vercel-env-push .env.local preview production
 
 The following options are available through the CLI:
 
-<table><tr><td width="400px" valign="top">
-
-##### --dry, --dry-run
+##### `--dry, --dry-run`
 
 List environment variables without pushing them.
-
-</td><td width="600px"><br>
 
 ```shell
 $ pnpm vercel-env-push .env.local development --dry
 ```
 
-</td></tr></table>
+##### `-t, --token`
 
-<table><tr><td width="400px" valign="top">
-
-##### -t, --token
-
-Login token to use for pushing environment variables. This can be especially useful if you ever need to push environment variables [from a CI pipeline](https://vercel.com/support/articles/using-vercel-cli-for-custom-workflows).
-
-</td><td width="600px"><br>
+Login token to use for pushing environment variables.
 
 ```shell
-$ VERCEL_ORG_ID=<ORG_ID> VERCEL_PROJECT_ID=<PROJECT_ID>
-  pnpm vercel-env-push .env.local development -t <TOKEN>
+$ VERCEL_ORG_ID=<ORG_ID> VERCEL_PROJECT_ID=<PROJECT_ID> pnpm vercel-env-push .env.local development -t <TOKEN>
 ```
+
+This can be especially useful if you ever need to push environment variables [from a CI pipeline](https://vercel.com/support/articles/using-vercel-cli-for-custom-workflows).
 
 ```yaml
 - name: Push environment variables from GitHub Actions
@@ -97,8 +88,6 @@ $ VERCEL_ORG_ID=<ORG_ID> VERCEL_PROJECT_ID=<PROJECT_ID>
     VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 ```
-
-</td></tr></table>
 
 ### API
 
@@ -110,31 +99,18 @@ pushEnvVars(envFilePath: string, envs: string[], options?: Options): Promise<voi
 
 #### Usage
 
-<table><tr><td width="400px" valign="top">
-
-#####
-
-Push the environment variables from the `.env.local` file to the _preview_ & _production_ environments.
-
-</td><td width="600px"><br>
-
 ```ts
 import { pushEnvVars } from 'vercel-env-push'
 
+// Push the environment variables from the .env.local file to the preview & production environments.
 await pushEnvVars('.env.local', ['preview', 'production'])
 ```
 
-</td></tr></table>
-
 #### Options
-
-<table><tr><td width="400px" valign="top">
 
 ##### `token`
 
 Determines a [login token](https://vercel.com/docs/cli#introduction/global-options/token) to use for pushing environment variables.
-
-</td><td width="600px"><br>
 
 ```ts
 import { pushEnvVars } from 'vercel-env-push'
@@ -144,15 +120,9 @@ await pushEnvVars('.env.local', ['preview', 'production'], {
 })
 ```
 
-</td></tr></table>
-
-<table><tr><td width="400px" valign="top">
-
 ##### `prePush`
 
 Specifies a callback that can be used to add/remove/edit environment variables before pushing.
-
-</td><td width="600px"><br>
 
 ```ts
 import { pushEnvVars } from 'vercel-env-push'
@@ -170,8 +140,6 @@ await pushEnvVars('.env.local', ['preview', 'production'], {
   },
 })
 ```
-
-</td></tr></table>
 
 > **Note**
 > The `dryRun` & `interactive` options are also available through the API but are mostly useless in this context.
