@@ -89,6 +89,14 @@ This can be especially useful if you ever need to push environment variables [fr
     VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 ```
 
+##### `-b, --branch`
+
+The Git branch to apply the environment variables to when pushing environment variables to the Preview environment.
+
+```shell
+$ pnpm vercel-env-push .env.local preview --branch my-preview-branch
+```
+
 ### API
 
 `vercel-env-push` can also be used through an API:
@@ -117,6 +125,18 @@ import { pushEnvVars } from 'vercel-env-push'
 
 await pushEnvVars('.env.local', ['preview', 'production'], {
   token: process.env.VERCEL_TOKEN,
+})
+```
+
+##### `branch`
+
+Determines a Git branch to apply the environment variables to when pushing environment variables to the Preview environment.
+
+```ts
+import { pushEnvVars } from 'vercel-env-push'
+
+await pushEnvVars('.env.local', ['preview'], {
+  branch: process.env.GIT_BRANCH,
 })
 ```
 
