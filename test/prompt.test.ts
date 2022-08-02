@@ -75,6 +75,16 @@ describe('prompt', () => {
     )
   })
 
+  test('should log the environment file path, push environment and git branch in interactive mode', async () => {
+    confirmSpy.mockResolvedValue()
+
+    await pushEnvVars('test/fixtures/.env.test', ['preview'], { interactive: true, branch: 'test-branch' })
+
+    expect(textSpy.mock.calls[0]?.[0](kolorist)).toMatchInlineSnapshot(
+      '"Preparing environment variables push from \'test/fixtures/.env.test\' to preview (branch: test-branch)."'
+    )
+  })
+
   test('should log redacted environment variables in interactive mode', async () => {
     confirmSpy.mockResolvedValue()
 

@@ -4,12 +4,12 @@ import { pluralize } from './libs/string'
 import { replaceEnvVars, validateVercelEnvs } from './libs/vercel'
 
 export async function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
-  validateVercelEnvs(envs)
+  validateVercelEnvs(envs, options?.branch)
 
   validateFile(envFilePath)
 
   if (options?.interactive) {
-    logParams(envFilePath, envs)
+    logParams(envFilePath, envs, options?.branch)
   }
 
   let envVars = parseEnvFile(envFilePath)
@@ -43,7 +43,7 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   }
 
   try {
-    await replaceEnvVars(envs, envVars, options?.token)
+    await replaceEnvVars(envs, envVars, { branch: options?.branch, token: options?.token })
   } catch (error) {
     if (options?.interactive && spinner) {
       spinner.error()
@@ -62,7 +62,7 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
   }
 }
 
-function logParams(envFilePath: string, envs: string[]) {
+function logParams(envFilePath: string, envs: string[], branch?: string) {
   text(({ cyan, green, red, yellow }) => {
     const formatter = new Intl.ListFormat('en', { style: 'short', type: 'conjunction' })
 
@@ -71,7 +71,7 @@ function logParams(envFilePath: string, envs: string[]) {
         if (env === 'development') {
           return green(env)
         } else if (env === 'preview') {
-          return yellow(env)
+          return yellow(`${env}${branch ? ` (branch: ${branch})` : ''}`)
         }
 
         return red(env)
@@ -89,6 +89,7 @@ function logEnvVars(envVars: EnvVars, envVarsCount: number) {
 }
 
 interface Options {
+  branch?: string
   dryRun?: boolean
   interactive?: boolean
   prePush?: (envVars: EnvVars) => EnvVars | Promise<EnvVars>

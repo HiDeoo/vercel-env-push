@@ -35,6 +35,20 @@ describe('env', () => {
       '"Unknown environment \'test\' specified."'
     )
   })
+
+  test('should throw if a git branch is specified with more than 1 environment', async () => {
+    await expect(
+      pushEnvVars('', ['preview', 'production'], { branch: 'test-branch' })
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      '"Only the preview environment can be specified when specifying a branch."'
+    )
+  })
+
+  test.todo('should throw if a git branch is specified with an environment that is not preview', async () => {
+    await expect(pushEnvVars('', ['production'], { branch: 'test-branch' })).rejects.toThrowErrorMatchingInlineSnapshot(
+      '"Only the preview environment can be specified when specifying a branch."'
+    )
+  })
 })
 
 describe('env var', () => {
@@ -248,10 +262,30 @@ describe('env var', () => {
       const envs = ['production']
       const token = 'testToken'
 
-      await pushEnvVars('test/fixtures/.env.test', ['production'], { token })
+      await pushEnvVars('test/fixtures/.env.test', envs, { token })
 
       let expectedCommands = getExpectedCommands(envs, defaultExpectedEnvVars)
       expectedCommands = expectedCommands.map((expectedCommand) => [`${expectedCommand} -t ${token}`])
+
+      expect(execSpy.mock.calls.length).toBe(expectedCommands.length)
+
+      for (const expectedCommand of expectedCommands) {
+        expect(execSpy.mock.calls).toContainEqual(expectedCommand)
+      }
+    })
+  })
+
+  describe('branch', () => {
+    test('should forward a git branch to the vercel CLI', async () => {
+      const envs = ['preview']
+      const branch = 'test-branch'
+
+      await pushEnvVars('test/fixtures/.env.test', envs, { branch })
+
+      let expectedCommands = getExpectedCommands(envs, defaultExpectedEnvVars)
+      expectedCommands = expectedCommands.map((expectedCommand) => [
+        expectedCommand[0].replace('preview', `${envs} ${branch}`),
+      ])
 
       expect(execSpy.mock.calls.length).toBe(expectedCommands.length)
 
