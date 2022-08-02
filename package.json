@@ -73,6 +73,6 @@
   "prettier": "@hideoo/prettier-config",
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown --cache",
-    "**/*.ts": "eslint . --max-warnings=0"
+    "**/*.ts": "eslint --max-warnings=0"
   }
 }
