@@ -2,7 +2,7 @@
   "name": "vercel-env-push",
   "description": "The missing Vercel CLI command to push environment variables from .env files.",
   "homepage": "https://github.com/HiDeoo/vercel-env-push",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "HiDeoo",
   "license": "MIT",
   "type": "module",
