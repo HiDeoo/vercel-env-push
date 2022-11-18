@@ -24,6 +24,9 @@ The [Vercel command-line interface (CLI)](https://vercel.com/docs/cli) provides 
 
 As I couldn't find any other tools providing this functionality with the features I wanted, I decided to write my own which internally uses [`npx`](https://docs.npmjs.com/cli/v8/commands/npx) to run the Vercel CLI either installed locally or fetched remotely.
 
+> **Note**
+> On November 17th 2022, Vercel [released](https://vercel.com/changelog/bulk-upload-now-available-for-environment-variables) bulk upload for environment variables altho this feature is only available through the Vercel Dashboard UI which is an improvement but still not ideal.
+
 ## Features
 
 - Usable as a command-line tool or through an API
