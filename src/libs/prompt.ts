@@ -6,6 +6,8 @@ import { createSpinner } from 'nanospinner'
 
 export { type Spinner } from 'nanospinner'
 
+const tableColumnWidth = Math.floor(((process.stdout.columns ?? 80) - 10) / 2)
+
 export function text(builder: (colors: typeof kolorist) => string) {
   console.log(builder(kolorist))
 }
@@ -14,8 +16,11 @@ export function table(builder: (colors: typeof kolorist) => [headers: string[], 
   const [headers, values] = builder(kolorist)
 
   const table = new Table({
+    colWidths: [tableColumnWidth, tableColumnWidth],
     head: headers,
     style: { head: [] },
+    wordWrap: true,
+    wrapOnWordBoundary: false,
   })
 
   table.push(...values)
