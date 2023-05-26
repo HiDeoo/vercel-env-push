@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### 🐞 Bug Fixes
 
 - Wrap long values during variables preview.
+- Update the number of requests per 10 seconds from 8 to 6 to avoid rate limiting.
 
 ## v0.3.0
 
