@@ -54,6 +54,9 @@ $ npx vercel-env-push <file> <env> [...otherEnvs]
 
 The `file` argument is the path to the .env file containing the environment variables to push. The `env` argument is the name of the environment to push the environment variables to (the supported environments are `development`, `preview` and `production`). You can specify multiple environments by separating them with spaces.
 
+> **Warning**
+> Due to the way the Vercel CLI works, if you have pre-existing environment variables associated to multiple environments (e.g. created through the Vercel Dashboard UI), running `vercel-env-push` to push environment variables to a single environment will remove the environment variables associated to the other environments. Note that environment variables pushed to multiple environments with `vercel-env-push` do not have this limitation as `vercel-env-push` will create a new environment variable for each environment instead of a single one shared across multiple environments.
+
 #### Usage
 
 ```shell
