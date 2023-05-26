@@ -8,7 +8,7 @@ import { throwIfAnyRejected } from './promise'
 
 const vercelEnvs = ['development', 'preview', 'production'] as const
 
-const rateLimiter = wyt(8, 10_000)
+let waitForRateLimiter: ReturnType<typeof wyt>
 
 export function validateVercelEnvs(envs: string[], branch?: string): asserts envs is VercelEnv[] {
   assert(envs.length > 0, 'No environments specified.')
@@ -31,6 +31,8 @@ export async function replaceEnvVars(envs: VercelEnv[], envVars: EnvVars, option
 }
 
 async function removeEnvVars(envs: VercelEnv[], envVars: EnvVars, options: VercelOptions) {
+  rateLimit()
+
   const promises: Promise<void>[] = []
 
   for (const envVarKey of Object.keys(envVars)) {
@@ -43,6 +45,8 @@ async function removeEnvVars(envs: VercelEnv[], envVars: EnvVars, options: Verce
 }
 
 async function addEnvVars(envs: VercelEnv[], envVars: EnvVars, options: VercelOptions) {
+  rateLimit()
+
   const promises: Promise<void>[] = []
 
   for (const [envVarKey, envVarValue] of Object.entries(envVars)) {
@@ -56,7 +60,7 @@ async function addEnvVars(envs: VercelEnv[], envVars: EnvVars, options: VercelOp
 
 async function addEnvVar(env: VercelEnv, key: string, value: string, options: VercelOptions) {
   try {
-    await rateLimiter()
+    await waitForRateLimiter()
 
     await execCommandWithNpx(
       `printf "${value}" | npx vercel env add ${key} ${env}${getBranchCommandArgument(
@@ -72,7 +76,7 @@ async function addEnvVar(env: VercelEnv, key: string, value: string, options: Ve
 
 async function removeEnvVar(env: VercelEnv, key: string, options: VercelOptions) {
   try {
-    await rateLimiter()
+    await waitForRateLimiter()
 
     await execCommandWithNpx(
       `npx vercel env rm ${key} ${env}${getBranchCommandArgument(options.branch)} -y${getTokenCommandArgument(
@@ -98,6 +102,10 @@ function getTokenCommandArgument(token?: VercelOptions['token']) {
 
 function getBranchCommandArgument(branch?: VercelOptions['branch']) {
   return branch && branch.length > 0 ? ` ${branch}` : ''
+}
+
+function rateLimit() {
+  waitForRateLimiter = wyt(6, 10_000)
 }
 
 type VercelEnv = typeof vercelEnvs[number]
