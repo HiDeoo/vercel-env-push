@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### 🐞 Bug Fixes
+
+- Wrap long values during variables preview.
+
 ## v0.3.0
 
 ### 🚀 Features
