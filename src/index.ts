@@ -27,7 +27,7 @@ export async function pushEnvVars(envFilePath: string, envs: string[], options?:
     return
   }
 
-  if (options?.interactive) {
+  if (options?.interactive && !options.yes) {
     await confirm(
       `Do you want to push ${pluralize(envVarsCount, 'this', 'these')} environment ${pluralize(
         envVarsCount,
@@ -94,4 +94,5 @@ interface Options {
   interactive?: boolean
   prePush?: (envVars: EnvVars) => EnvVars | Promise<EnvVars>
   token?: string
+  yes?: boolean
 }

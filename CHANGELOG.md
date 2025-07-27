@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### 🚀 Features
+
+- Add the `--yes` option to skip confirmation prompts in interactive mode.
+
 ## v0.4.0
 
 ### 🐞 Bug Fixes

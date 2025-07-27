@@ -18,6 +18,7 @@ cli
   .option('--dry, --dry-run', 'List environment variables without pushing them')
   .option('-t, --token <token>', 'Login token to use for pushing environment variables')
   .option('-b, --branch <branch>', 'Specific git branch for pushed preview environment variables')
+  .option('-y, --yes', 'Skip confirmation prompt for pushing environment variables')
   .action(async (file: string, env: string, otherEnvs: string[], options: CliOptions) => {
     await pushEnvVars(file, [env, ...otherEnvs], { ...options, interactive: true })
   })
@@ -46,4 +47,5 @@ interface CliOptions {
   branch?: string
   dryRun?: boolean
   token?: string
+  yes?: boolean
 }

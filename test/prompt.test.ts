@@ -43,6 +43,12 @@ describe('prompt', () => {
     expect(confirmSpy).not.toHaveBeenCalled()
   })
 
+  test('should not ask for confirmation in interactive mode with --yes option', async () => {
+    await pushEnvVars('test/fixtures/.env.test', ['production'], { interactive: true, yes: true })
+
+    expect(confirmSpy).not.toHaveBeenCalled()
+  })
+
   test('should not push environment variables in interactive mode with no confirmation', async () => {
     confirmSpy.mockRejectedValue(new Error('test'))
 
