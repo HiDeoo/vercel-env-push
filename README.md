@@ -88,7 +88,7 @@ This can be especially useful if you ever need to push environment variables [fr
 
 ```yaml
 - name: Push environment variables from GitHub Actions
-  run: pnpm vercel-env-push .env.local preview -t "$VERCEL_TOKEN"
+  run: pnpm vercel-env-push .env.ci preview -t "$VERCEL_TOKEN" --yes
   env:
     VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
     VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -101,6 +101,21 @@ The Git branch to apply the environment variables to when pushing environment va
 
 ```shell
 $ pnpm vercel-env-push .env.local preview --branch my-preview-branch
+```
+
+##### `-y, --yes`
+
+Skip confirmation prompt for pushing environment variables.
+
+This can be especially useful if you ever need to push environment variables [from a CI pipeline](https://vercel.com/support/articles/using-vercel-cli-for-custom-workflows).
+
+```yaml
+- name: Push environment variables from GitHub Actions
+  run: pnpm vercel-env-push .env.ci preview -t "$VERCEL_TOKEN" --yes
+  env:
+    VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+    VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 ```
 
 ### API
@@ -168,7 +183,7 @@ await pushEnvVars('.env.local', ['preview', 'production'], {
 ```
 
 > **Note**
-> The `dryRun` & `interactive` options are also available through the API but are mostly useless in this context.
+> The `dryRun`, `interactive`, & `yes` options are also available through the API but are mostly useless in this context.
 
 ## License
 
