@@ -50,7 +50,7 @@
     "cli.mjs",
     "dist"
   ],
-  "packageManager": "pnpm@7.4.0",
+  "packageManager": "pnpm@9.15.9",
   "sideEffects": false,
   "engines": {
     "node": ">=14.0.0"
