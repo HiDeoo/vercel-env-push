@@ -147,7 +147,7 @@ await pushEnvVars('.env.local', ['preview', 'production'])
 
 ##### `allowCustomEnv`
 
-Allows custom Vercel environment slugs (e.g. `staging`) in addition to the default environments.
+Allows custom Vercel environment names (e.g. `staging`) in addition to the default environments.
 
 ```ts
 import { pushEnvVars } from 'vercel-env-push'
