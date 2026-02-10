@@ -15,7 +15,7 @@ cli.version(version).help((sections) => {
 
 cli
   .command('<file> <env> [...otherEnvs]')
-  .option('--allow-custom-env, --custom-env', 'Allow custom environment slugs (e.g. staging)')
+  .option('--allow-custom-env, --custom-env', 'Allow custom environment names (e.g. staging, app-qa, qa_team)')
   .option('--dry, --dry-run', 'List environment variables without pushing them')
   .option('-t, --token <token>', 'Login token to use for pushing environment variables')
   .option('-b, --branch <branch>', 'Specific git branch for pushed preview environment variables')
