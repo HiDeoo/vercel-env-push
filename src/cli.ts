@@ -9,7 +9,7 @@ const cli = cac('vercel-env-push')
 
 cli.version(version).help((sections) => {
   sections.splice(3, 0, {
-    body: 'Default environments: development - preview - production (use --allow-custom-env for custom slugs)',
+    body: 'Default environments: development - preview - production (use --allow-custom-env for custom environments)',
   })
 })
 
