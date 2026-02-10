@@ -70,7 +70,7 @@ The following options are available through the CLI:
 
 ##### `--allow-custom-env`
 
-Allow custom Vercel environment slugs (e.g. `staging`).
+Allow custom Vercel environment names (e.g. `staging`).
 
 ```shell
 $ pnpm vercel-env-push .env.local staging --allow-custom-env
