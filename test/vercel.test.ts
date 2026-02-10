@@ -64,7 +64,7 @@ describe('env', () => {
     )
   })
 
-  test.todo('should throw if a git branch is specified with an environment that is not preview', async () => {
+  test('should throw if a git branch is specified with a known environment that is not preview', async () => {
     await expect(pushEnvVars('', ['production'], { branch: 'test-branch' })).rejects.toThrowErrorMatchingInlineSnapshot(
       '"Only the preview environment can be specified when specifying a branch."'
     )

@@ -7,7 +7,7 @@ import { exec, isExecError } from './process'
 import { throwIfAnyRejected } from './promise'
 
 const knownVercelEnvs = ['development', 'preview', 'production'] as const
-const customVercelEnvRegex = /^[\da-z][\da-z-]*$/
+const customVercelEnvRegex = /^[\d_a-z-]+$/
 
 let waitForRateLimiter: ReturnType<typeof wyt>
 
