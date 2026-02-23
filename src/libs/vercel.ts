@@ -6,18 +6,24 @@ import { type EnvVars } from './file'
 import { exec, isExecError } from './process'
 import { throwIfAnyRejected } from './promise'
 
-const vercelEnvs = ['development', 'preview', 'production'] as const
+const knownVercelEnvs = ['development', 'preview', 'production'] as const
+const customVercelEnvRegex = /^[\d_a-z-]+$/
 
 let waitForRateLimiter: ReturnType<typeof wyt>
 
-export function validateVercelEnvs(envs: string[], branch?: string): asserts envs is VercelEnv[] {
+export function validateVercelEnvs(envs: string[], options?: ValidateVercelEnvsOptions): asserts envs is VercelEnv[] {
   assert(envs.length > 0, 'No environments specified.')
 
   for (const env of envs) {
-    assert((vercelEnvs as ReadonlyArray<string>).includes(env), `Unknown environment '${env}' specified.`)
+    if (isKnownVercelEnv(env)) {
+      continue
+    }
+
+    assert(options?.allowCustomEnv, `Unknown environment '${env}' specified.`)
+    assert(customVercelEnvRegex.test(env), `Invalid custom environment '${env}' specified.`)
   }
 
-  if (branch && branch.length > 0) {
+  if (options?.branch && options.branch.length > 0) {
     assert(
       envs.length === 1 && envs[0] === 'preview',
       'Only the preview environment can be specified when specifying a branch.'
@@ -108,7 +114,17 @@ function rateLimit() {
   waitForRateLimiter = wyt(6, 10_000)
 }
 
-type VercelEnv = typeof vercelEnvs[number]
+function isKnownVercelEnv(env: string): env is KnownVercelEnv {
+  return (knownVercelEnvs as ReadonlyArray<string>).includes(env)
+}
+
+type KnownVercelEnv = typeof knownVercelEnvs[number]
+type VercelEnv = string
+
+interface ValidateVercelEnvsOptions {
+  allowCustomEnv?: boolean
+  branch?: string
+}
 
 interface VercelOptions {
   branch?: string

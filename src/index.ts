@@ -4,7 +4,7 @@ import { pluralize } from './libs/string'
 import { replaceEnvVars, validateVercelEnvs } from './libs/vercel'
 
 export async function pushEnvVars(envFilePath: string, envs: string[], options?: Options) {
-  validateVercelEnvs(envs, options?.branch)
+  validateVercelEnvs(envs, { allowCustomEnv: options?.allowCustomEnv, branch: options?.branch })
 
   validateFile(envFilePath)
 
@@ -68,13 +68,20 @@ function logParams(envFilePath: string, envs: string[], branch?: string) {
 
     return `Preparing environment variables push from ${cyan(`'${envFilePath}'`)} to ${formatter.format(
       envs.map((env) => {
-        if (env === 'development') {
-          return green(env)
-        } else if (env === 'preview') {
-          return yellow(`${env}${branch ? ` (branch: ${branch})` : ''}`)
+        switch (env) {
+          case 'development': {
+            return green(env)
+          }
+          case 'preview': {
+            return yellow(`${env}${branch ? ` (branch: ${branch})` : ''}`)
+          }
+          case 'production': {
+            return red(env)
+          }
+          default: {
+            return cyan(`${env} (custom)`)
+          }
         }
-
-        return red(env)
       })
     )}.`
   })
@@ -89,6 +96,7 @@ function logEnvVars(envVars: EnvVars, envVarsCount: number) {
 }
 
 interface Options {
+  allowCustomEnv?: boolean
   branch?: string
   dryRun?: boolean
   interactive?: boolean

@@ -9,18 +9,25 @@ const cli = cac('vercel-env-push')
 
 cli.version(version).help((sections) => {
   sections.splice(3, 0, {
-    body: 'Environments: development - preview - production',
+    body: 'Default environments: development - preview - production (use --allow-custom-env for custom environments)',
   })
 })
 
 cli
   .command('<file> <env> [...otherEnvs]')
+  .option('--allow-custom-env, --custom-env', 'Allow custom environment names (e.g. staging, app-qa, qa_team)')
   .option('--dry, --dry-run', 'List environment variables without pushing them')
   .option('-t, --token <token>', 'Login token to use for pushing environment variables')
   .option('-b, --branch <branch>', 'Specific git branch for pushed preview environment variables')
   .option('-y, --yes', 'Skip confirmation prompt for pushing environment variables')
   .action(async (file: string, env: string, otherEnvs: string[], options: CliOptions) => {
-    await pushEnvVars(file, [env, ...otherEnvs], { ...options, interactive: true })
+    const { allowCustomEnv, customEnv, ...otherOptions } = options
+
+    await pushEnvVars(file, [env, ...otherEnvs], {
+      ...otherOptions,
+      allowCustomEnv: customEnv ?? allowCustomEnv,
+      interactive: true,
+    })
   })
 
 async function run() {
@@ -44,7 +51,9 @@ async function run() {
 run()
 
 interface CliOptions {
+  allowCustomEnv?: boolean
   branch?: string
+  customEnv?: boolean
   dryRun?: boolean
   token?: string
   yes?: boolean

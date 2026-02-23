@@ -36,6 +36,18 @@ describe('env', () => {
     )
   })
 
+  test('should allow a custom environment when explicitly enabled', async () => {
+    await expect(
+      pushEnvVars('test/fixtures/.env.test', ['staging'], { allowCustomEnv: true, dryRun: true })
+    ).resolves.toBeUndefined()
+  })
+
+  test('should throw if an invalid custom environment is provided', async () => {
+    await expect(pushEnvVars('', ['Staging'], { allowCustomEnv: true })).rejects.toThrowErrorMatchingInlineSnapshot(
+      '"Invalid custom environment \'Staging\' specified."'
+    )
+  })
+
   test('should throw if a git branch is specified with more than 1 environment', async () => {
     await expect(
       pushEnvVars('', ['preview', 'production'], { branch: 'test-branch' })
@@ -44,7 +56,15 @@ describe('env', () => {
     )
   })
 
-  test.todo('should throw if a git branch is specified with an environment that is not preview', async () => {
+  test('should throw if a git branch is specified with a custom environment', async () => {
+    await expect(
+      pushEnvVars('', ['staging'], { allowCustomEnv: true, branch: 'test-branch' })
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      '"Only the preview environment can be specified when specifying a branch."'
+    )
+  })
+
+  test('should throw if a git branch is specified with a known environment that is not preview', async () => {
     await expect(pushEnvVars('', ['production'], { branch: 'test-branch' })).rejects.toThrowErrorMatchingInlineSnapshot(
       '"Only the preview environment can be specified when specifying a branch."'
     )

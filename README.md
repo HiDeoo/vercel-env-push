@@ -52,7 +52,7 @@ or use it directly with `npx`:
 $ npx vercel-env-push <file> <env> [...otherEnvs]
 ```
 
-The `file` argument is the path to the .env file containing the environment variables to push. The `env` argument is the name of the environment to push the environment variables to (the supported environments are `development`, `preview` and `production`). You can specify multiple environments by separating them with spaces.
+The `file` argument is the path to the .env file containing the environment variables to push. The `env` argument is the target environment. By default, supported environments are `development`, `preview` and `production`. You can specify multiple environments by separating them with spaces. To target a custom environment name (e.g. `staging`), use `--allow-custom-env`.
 
 > **Warning**
 > Due to the way the Vercel CLI works, if you have pre-existing environment variables associated to multiple environments (e.g. created through the Vercel Dashboard UI), running `vercel-env-push` to push environment variables to a single environment will remove the environment variables associated to the other environments. Note that environment variables pushed to multiple environments with `vercel-env-push` do not have this limitation as `vercel-env-push` will create a new environment variable for each environment instead of a single one shared across multiple environments.
@@ -67,6 +67,14 @@ $ pnpm vercel-env-push .env.local preview production
 #### Options
 
 The following options are available through the CLI:
+
+##### `--allow-custom-env`, `--custom-env`
+
+Allow custom Vercel environment names (e.g. `staging`).
+
+```shell
+$ pnpm vercel-env-push .env.local staging --allow-custom-env
+```
 
 ##### `--dry, --dry-run`
 
@@ -136,6 +144,18 @@ await pushEnvVars('.env.local', ['preview', 'production'])
 ```
 
 #### Options
+
+##### `allowCustomEnv`
+
+Allows custom Vercel environment names (e.g. `staging`) in addition to the default environments.
+
+```ts
+import { pushEnvVars } from 'vercel-env-push'
+
+await pushEnvVars('.env.local', ['staging'], {
+  allowCustomEnv: true,
+})
+```
 
 ##### `token`
 
