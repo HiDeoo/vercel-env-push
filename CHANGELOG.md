@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.6.0
+
+### 🚀 Features
+
+- Add the `--allow-custom-env` option to support custom Vercel environment names.
+
 ## v0.5.0
 
 ### 🚀 Features
