@@ -68,7 +68,7 @@ $ pnpm vercel-env-push .env.local preview production
 
 The following options are available through the CLI:
 
-##### `--allow-custom-env`, `--custom-env`
+##### `--allow-custom-env, --custom-env`
 
 Allow custom Vercel environment names (e.g. `staging`).
 
